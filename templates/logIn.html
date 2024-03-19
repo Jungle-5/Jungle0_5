@@ -26,7 +26,7 @@
             $.ajax({
                 type: "POST",
                 url: "/api/login",
-                data: { uid: uid, pw: pw },
+                data: { 'uid': uid, 'pw': pw },
                 success: function (response) {
                     if (response['result'] == 'success') {
                         // '로그인 완료' 얼럿을 띄웁니다.
