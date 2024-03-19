@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SIGNUP</title>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script>
+            function register(){
+                $.ajax({
+                    type: "POST",
+                    url: "/api/register",
+                    data: {
+                        'id_insert': $('#uid').val(),
+                        'pw_insert': $('#password').val(),
+                        'name_insert': $('#uname').val(),
+                        'phone_insert': $('#phone').val()
+                    },
+                    success: function (response){
+                        if(response['result'] == 'success'){
+                            alert('회원가입 성공')
+                            window.location.href = '/api/login'
+                        }else{
+                            alert(response['msg'])
+                        }
+                    }
+                })
+            }
+        </script>
+    </head>
+    <body>
+        <h1>회원가입</h1>
+        <hr>
+        <b>ID</b><br>
+        <input type="text" id="uid" name="uid" placeholder="아이디"><br>
+        <b>PW</b><br>
+        <input type="text" id="password" name="password" placeholder="패스워드"><br>
+        <b>이름</b><br>
+        <input type="text" id="uname" name="uname" placeholder="이름"><br>
+        <b>번호</b><br>
+        <input type="text" id="phone" name="phone" placeholder="휴대폰 번호"><br><br>
+        <button class="done" type="button" onclick="register()">확인</button>
+    </body>
+</html>

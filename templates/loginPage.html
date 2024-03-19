@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SIGNUP</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script>
+            function loginClick(){
+                $.ajax({
+                    type: "POST",
+                    url: "/api/login",
+                    data: {
+                        'id_login': $('#login_id').val(),
+                        'pw_login': $('#login_pw').val()
+                    },
+                    success: function(response){
+                        if(response['result'] == 'success'){
+                            //로그인 성공시 토큰을 받아와 usertoken이라는 키 값으로 cookie에 저장
+                            document.cookie = 'usertoken=' + response['token'] + '; path=/';
+                            alert('로그인 성공')
+                            //메인 페이지 이동
+                        }else{
+                            alert(response['msg'])
+                        }
+                    }
+                })
+            }
+
+        </script>
+    
+    </head>
+    <body>
+        <h1>로그인</h1>
+        <hr>
+        <b>ID</b><br>
+        <input id="login_id" type="text" name="uid" placeholder="아이디"><br>
+        <b>PW</b><br>
+        <input id="login_pw" type="text" name="password" placeholder="패스워드"><br>
+        <button class="sign_up" type="button" onclick="loginClick()">로그인</button>
+        <button class="register" type="button">회원가입</button>
+    </body>
+</html>
