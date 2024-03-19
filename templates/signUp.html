@@ -23,6 +23,7 @@
             var pw = $('#pw').val()
             var name = $('#name').val()
             var phoneNum = $('#phoneNumber').val()
+            window.location.href = 'login.html';
             $.ajax({
                 type: "POST",
                 url: "/api/signup",
