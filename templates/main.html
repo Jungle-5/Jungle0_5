@@ -49,15 +49,16 @@
         .suggestor {
             display: flex;
         }
+
+        .card {
+            display: none;
+        }
     </style>
     <script>
         function searchPosts(pageNumber) {
             const countPerPage = 10;
             const start = (pageNumber - 1) * 10;
             console.log(countPerPage, start);
-
-
-
         }
 
         function addProduct(isWow) {
@@ -65,7 +66,7 @@
             var minNum = $("select :selected").val();
             $.ajax({
                 type: 'POST',
-                url: 'api/add/product',
+                url: '/api/add/product',
                 data: { 'url': url, 'minNum': minNum, 'wow': isWow },
                 success: function (response) {
                     if (response['result'] == 'success') {
@@ -87,13 +88,75 @@
             return checkbox.checked;
         }
 
+        function changeVisability() {
 
+        }
+        function openclose() {
+            let status = $('#card').css('display')
+            if (status == 'none') {
+                $('#card').show()
+                // $('#posting-box-btn').text('포스팅박스 열기')
+            } else {
+                $('#card').hide()
+                // $('#posting-box-btn').text('포스팅박스 닫기')
+            }
+        }
+        function showList() {
+            $.ajax({
+                type: "GET",
+                url: "/api/list",
+                data: { 'sortMode': sortMode },
+                success: function (response) {
+                    if (response['result'] != 'success') {
+                        alert(sortMode + ' 순으로 영화 목록 받아오기 실패!')
+                        return
+                    }
+                    // 3. 서버가 돌려준 stars_list를 movies 라는 변수에 저장합니다.
+                    let movies = response['movies_list']
+                    // 4. 영화 카드를 추가합니다. 이 때 휴지통 여부에 따라 카드 모양이 달라지므로 휴지통 여부(=false)도 같이 전달합니다.
+                    addMovieCards(movies, false)
+                },
+            })
+        }
 
     </script>
 </head>
 
 <body>
-    <div class="card">
+
+
+    <div class="title">메인 페이지</div>
+
+    <div class="column" style="background-color: #E9E9E9;">
+        <div class="media">
+            <div class="media-left">
+                <figure class="image">
+                    <img src="https://bulma.io/images/placeholders/96x96.png" alt="">
+                </figure>
+            </div>
+            <div class="media-content">
+                <div class="nameInfo">
+                    <div class="title">Macbook Air</div>
+
+                </div>
+                <p class="subtitle">1,415,200원</p>
+                <p class="participant" onclick="alert('참여인원출력')">2 / 10명</p>
+                <p class="date">만료 3일전 </p>
+            </div>
+            <div class="media-right">
+                <div class="suggestor">
+                    <div class="wowImage"><img src="/Users/kimhyeokjoon/Jungle/project/_049/static/로켓_icon.png" alt="">
+                    </div>
+                    <div class="suggestorName">심우정</div>
+                </div>
+                <button class="button is-primary">참여</button>
+                <button class="button is-danger">취소</button>
+            </div>
+        </div>
+    </div>
+    <button class="posting-box-btn" onclick="openclose()">+</button>
+
+    <div id="card" , class="card">
         <header class="card-header">
             <p class="card-header-title">
                 등록하기
@@ -129,44 +192,15 @@
                 와우 회원 여부
             </label>
         </div>
+
+        <footer class="card-footer">
+            <a href="#" onclick="openclose()" class="card-footer-item">취소하기</a>
+            <a href="#" onclick="addProduct(is_checked())" class="card-footer-item">등록하기</a>
+        </footer>
     </div>
-    <footer class="card-footer">
-        <a href="#" class="card-footer-item">취소하기</a>
-        <a href="#" onclick="addProduct(is_checked())" class="card-footer-item">등록하기</a>
-    </footer>
     </div>
 
 
-    <div class="title">메인 페이지</div>
-
-    <div class="column" style="background-color: #E9E9E9;">
-        <div class="media">
-            <div class="media-left">
-                <figure class="image">
-                    <img src="https://bulma.io/images/placeholders/96x96.png" alt="">
-                </figure>
-            </div>
-            <div class="media-content">
-                <div class="nameInfo">
-                    <div class="title">Macbook Air</div>
-
-                </div>
-                <p class="subtitle">1,415,200원</p>
-                <p class="participant" onclick="alert('참여인원출력')">2 / 10명</p>
-                <p class="date">만료 3일전 </p>
-            </div>
-            <div class="media-right">
-                <div class="suggestor">
-                    <div class="wowImage"><img src="/Users/kimhyeokjoon/Jungle/project/_049/static/로켓_icon.png" alt="">
-                    </div>
-                    <div class="suggestorName">심우정</div>
-                </div>
-                <button class="button is-primary">참여</button>
-                <button class="button is-danger">취소</button>
-            </div>
-        </div>
-    </div>
-    <button onclick="addProduct()">+</button>
 
     <nav class="pagination" role="navigation" aria-label="pagination">
         <!-- <a class="pagination-previous">Previous</a>

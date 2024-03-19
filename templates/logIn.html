@@ -32,8 +32,6 @@
                         // '로그인 완료' 얼럿을 띄웁니다.
                         document.cookie = 'usertoken=' + response['token'] + '; path=/';
                         alert('로그인 완료')
-                        // 메인 페이지로 이동합니다.
-                        window.location.href = 'https://naver.com';
                     } else {
                         alert('로그인 실패')
                     }
@@ -41,8 +39,8 @@
             });
         }
 
-        function signUpPage(){
-            
+        function signUpPage() {
+            window.location.href = '/toSignUp';
         }
 
     </script>
