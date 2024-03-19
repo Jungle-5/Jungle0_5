@@ -27,7 +27,7 @@
             $.ajax({
                 type: "POST",
                 url: "/api/signup",
-                data: { uid: uid, pw: pw, name: name, phoneNum: phoneNum },
+                data: { 'uid': uid, 'pw': pw, 'name': name, 'phoneNum': phoneNum },
                 success: function (response) {
                     if (response['result'] == 'success') {
                         // '가입 완료' 얼럿을 띄웁니다.

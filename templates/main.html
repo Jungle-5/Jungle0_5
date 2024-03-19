@@ -63,6 +63,18 @@
         function addProduct(isWow) {
             var url = $('#url').val()
             var minNum = $("select :selected").val();
+            $.ajax({
+                type: 'POST',
+                url: 'api/add/product',
+                data: { 'url': url, 'minNum': minNum, 'wow': isWow },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert('등록 완료')
+                    } else {
+                        alert('등록 실패 ')
+                    }
+                }
+            })
             console.log(url)
             console.log(minNum)
             console.log(isWow)
