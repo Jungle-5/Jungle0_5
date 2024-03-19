@@ -23,7 +23,6 @@
             var pw = $('#pw').val()
             var name = $('#name').val()
             var phoneNum = $('#phoneNumber').val()
-            window.location.href = 'login.html';
             $.ajax({
                 type: "POST",
                 url: "/api/signup",
@@ -76,7 +75,7 @@
                     <input class="input" type="id" id="id" placeholder="ID">
                 </div>
                 <label class="checkbox">
-                    <input type="checkbox"><button onclick="checkDuplicate(id)">중복 검사</button>
+                    <input type="checkbox"><button onclick="checkDuplicate()">중복 검사</button>
                 </label>
             </div>
 

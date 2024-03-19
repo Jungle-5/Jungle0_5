@@ -24,8 +24,8 @@
             var pw = $('#PW').val()
             alert('login start')
             $.ajax({
-                type: "POST",
-                url: "/api/login",
+                type: 'POST',
+                url: '/api/login',
                 data: { 'uid': uid, 'pw': pw },
                 success: function (response) {
                     if (response['result'] == 'success') {
@@ -39,6 +39,10 @@
                     }
                 }
             });
+        }
+
+        function signUpPage(){
+            
         }
 
     </script>
@@ -70,7 +74,7 @@
             <button onclick="logIn()" class="button is-primary">로그인</button>
 
         </form>
-        <button onclick="location.href='signUp.html'" class="button is-primary">회원가입</button>
+        <button onclick="signUpPage()" class="button is-primary">회원가입</button>
 
     </div>
 
