@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- jQuery 를 포함합니다. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- CSS library 인 Bulma 를 포함합니다. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
+
+    <!-- 텍스트형태로 되어있는 icon 을 쓸 수 있도록 Font awesome 을 포함하빈다. -->
+    <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
+
+    <title>로그인 페이지</title>
+
+    <script>
+        // 로그인 기능
+        function logIn() {
+            var uid = $('#id').val()
+            var pw = $('#PW').val()
+            alert('login start')
+            $.ajax({
+                type: "POST",
+                url: "/api/login",
+                data: { 'uid': uid, 'pw': pw },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        // '로그인 완료' 얼럿을 띄웁니다.
+                        document.cookie = 'usertoken=' + response['token'] + '; path=/';
+                        alert('로그인 완료')
+                        // 메인 페이지로 이동합니다.
+                        window.location.href = 'https://naver.com';
+                    } else {
+                        alert('로그인 실패')
+                    }
+                }
+            });
+        }
+
+    </script>
+</head>
+
+<body>
+    <div class="content">
+        <div class="titleContainer">
+            <h1>공구할 사람 구함</h1>
+        </div>
+
+        <form class="box">
+            <div>
+                <div class="field">
+                    <label class="label">ID</label>
+                    <div class="control">
+                        <input class="input" type="id" id="id" placeholder="e.g. alex@example.com">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" id="PW" placeholder="********">
+                    </div>
+                </div>
+
+            </div>
+            <button onclick="logIn()" class="button is-primary">로그인</button>
+
+        </form>
+        <button onclick="location.href='signUp.html'" class="button is-primary">회원가입</button>
+
+    </div>
+
+
+</body>
+
+</html>
