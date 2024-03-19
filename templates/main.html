@@ -36,6 +36,10 @@
 
         }
 
+        .media {
+            width: inherit;
+        }
+
         .wowImage {
             width: 30px;
             height: 30px;
@@ -47,6 +51,10 @@
         }
 
         .suggestor {
+            display: flex;
+        }
+
+        .column {
             display: flex;
         }
 
@@ -134,79 +142,84 @@
                 let sname = list['sname']
                 let price = list['price'].toLocaleString()
 
-                // 2. 영화 카드를 만듭니다.
-                let cardContentHtml = `
-                    <div class="row g-0">
-                        <div class="col-sm-3">
-                            <img src=${poster} class="movie-poster" alt="...">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <a href="${info}" target="_blank" rel="noopener noreferrer" class="movie-title">${title}</a>
-                                <p>
-                                    <span class="icon"><i class="fas fa-thumbs-up"></i></span>
-                                    <span class="movie-likes">${likes}</span>
-                                </p>
-                                <p>
-                                    누적관객수<span id="viewers" class="movie-viewers"> ${viewers}</span>명
-                                </p>
-                                <p>
-                                    개봉일<span id="viewers" class="movie-viewers"> ${date}</span>
-                                </p>
+                // 3. 휴지통을 보고 있는지 여부에 따라 카드의 버튼을 다르게 설정해줍니다.
+                let cardHtml = ''
+                if (trashMode == false) {
+                    cardHtml = `
+                    <div class="column" style="background-color: #E9E9E9;">
+                        <div>${state}</div>
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image">
+                                    <img src="${thumbnail}" alt="">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <div class="nameInfo">
+                                    <div class="title">${pname}</div>
+
+                                </div>
+                                <p class="subtitle">${price}원</p>
+                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="date">만료 ${date}일전 </p>
+                            </div>
+                            <div class="media-right">
+                                <div class="suggestor">
+                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    </div>
+                                    <div class="suggestorName">${sname}</div>
+                                </div>
+                                <button class="button is-primary" onclick="join()">참여</button>
                             </div>
                         </div>
                     </div>
-                    `
-
-                // 3. 휴지통을 보고 있는지 여부에 따라 카드의 버튼을 다르게 설정해줍니다.
-                let cardFooterHtml = ''
-                if (trashMode == false) {
-                    cardFooterHtml = `
-                        <div class="footer">
-                            <div class="movie-button1" onclick="likeMovie('${id}')">
-                                <a href="#" style="color: rgb(49, 136, 218);" >
-                                    위로!
-                                    <i class="fas fa-thumbs-up"></i>
-                                </a>
-                            </div>
-                            <div class="movie-button2" onclick="trashMovie('${id}')">
-                                <a href="#" style= "color: rgb(202, 42, 96);" >
-                                    휴지통으로
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
-                            </div>
-                        </div>
                         `
                 } else {
-                    cardFooterHtml = `
-                        <div class="footer">
-                            <div class="movie-button3" onclick="restoreMovie('${id}')">
-                                <a href="#" style="color: rgb(49, 136, 218);" >
-                                복구하기
-                                <i class="fa-solid fa-trash-arrow-up"></i>
-                                </a>
+                    cardHtml = `
+                    <div class="column" style="background-color: #E9E9E9;">
+                        <div>${state}</div>
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image">
+                                    <img src="${thumbnail}" alt="">
+                                </figure>
                             </div>
-                            <div class="movie-button4"  onclick="deleteMovie('${id}')">
-                                <a href="#" style= "color: rgb(202, 42, 96);">
-                                영구삭제
-                                <i class="fa-solid fa-ban"></i>
-                                </a>
+                            <div class="media-content">
+                                <div class="nameInfo">
+                                    <div class="title">${pname}</div>
+
+                                </div>
+                                <p class="subtitle">${price}원</p>
+                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="date">만료 ${date}일전 </p>
+                            </div>
+                            <div class="media-right">
+                                <div class="suggestor">
+                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    </div>
+                                    <div class="suggestorName">${sname}</div>
+                                </div>
+                                <button class="button is-danger" onclick="cancel()">취소</button>
                             </div>
                         </div>
+                    </div>
                         `
                 }
 
                 // 4. #movie-box에 생성된 HTML 을 붙입니다.
                 $('#movie-box').append(`
                         <div class="card">
-                            ${cardContentHtml}
-                            <hr>
-                            ${cardFooterHtml}
+                            ${cardHtml}
                         </div>
                     `)
             }
         }
+        function join(){
 
+        }
+        function cancel(){
+            
+        }
     </script>
 </head>
 
@@ -219,33 +232,7 @@
 
     </div>
 
-    <div class="column" style="background-color: #E9E9E9;">
-        <div class="media">
-            <div class="media-left">
-                <figure class="image">
-                    <img src="${thumbnail}" alt="">
-                </figure>
-            </div>
-            <div class="media-content">
-                <div class="nameInfo">
-                    <div class="title">${pname}</div>
 
-                </div>
-                <p class="subtitle">${price}원</p>
-                <p class="participant" onclick="showMemberList()">2 / 10명</p>
-                <p class="date">만료 ${date}일전 </p>
-            </div>
-            <div class="media-right">
-                <div class="suggestor">
-                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
-                    </div>
-                    <div class="suggestorName">심우정</div>
-                </div>
-                <button class="button is-primary">참여</button>
-                <button class="button is-danger">취소</button>
-            </div>
-        </div>
-    </div>
 
     <button class="posting-box-btn" onclick="openclose()">+</button>
 
