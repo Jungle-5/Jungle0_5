@@ -20,8 +20,8 @@
     <script>
         // 로그인 기능
         function logIn() {
-            var uid = console.log($('#id').val())
-            var pw = console.log($('#PW').val())
+            var uid = $('#id').val()
+            var pw = $('#PW').val()
             alert('login start')
             $.ajax({
                 type: "POST",
@@ -30,6 +30,7 @@
                 success: function (response) {
                     if (response['result'] == 'success') {
                         // '로그인 완료' 얼럿을 띄웁니다.
+                        document.cookie = 'usertoken=' + response['token'] + '; path=/';
                         alert('로그인 완료')
                         // 메인 페이지로 이동합니다.
                         window.location.href = 'https://naver.com';

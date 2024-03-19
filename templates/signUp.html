@@ -48,7 +48,7 @@
             $.ajax({
                 type: "POST",
                 url: "/api/check/Duplicate",
-                data: { inputId: inputId },
+                data: { 'inputId': inputId },
                 success: function (response) {
                     if (response.cnt > 0) {
                         alert("아이디가 존재합니다. 다른 아이디를 입력해주세요.");
@@ -83,20 +83,20 @@
             <div class="field">
                 <label class="label">Password</label>
                 <div class="control">
-                    <input class="input" type="password" id="PW" placeholder="********">
+                    <input class="input" type="password" id="pw" placeholder="********">
                 </div>
             </div>
             <div class="field">
                 <label class="label">이름</label>
                 <div class="control">
-                    <input class="input" type="password" id="name" placeholder="공사구">
+                    <input class="input" id="name" placeholder="공사구">
                 </div>
             </div>
 
             <div class="field">
                 <label class="label">전화번호</label>
                 <div class="control">
-                    <input class="input" type="password" id="phoneNumber" placeholder="(-)없이 입력)">
+                    <input class="input" id="phoneNumber" placeholder="(-)없이 입력)">
                 </div>
             </div>
 
