@@ -18,7 +18,11 @@
     <title>회원 가입 페이지</title>
 
     <script>
-        function signUp(uid, pw, name, phoneNum) {
+        function signUp() {
+            var uid = $('#id').val()
+            var pw = $('#pw').val()
+            var name = $('#name').val()
+            var phoneNum = $('#phoneNumber').val()
             window.location.href = 'login.html';
             $.ajax({
                 type: "POST",
@@ -39,7 +43,8 @@
             });
         }
 
-        function checkDuplicate(inputId) {
+        function checkDuplicate() {
+            var inputId = $('#inputId').val()
             $.ajax({
                 type: "POST",
                 url: "/api/check/Duplicate",
@@ -99,7 +104,7 @@
 
     </form>
 
-    <button onclick="signUp('id','pw','name','phoneNumber')" class="button is-primary">회원 가입</button>
+    <button onclick="signUp()" class="button is-primary">회원 가입</button>
 
 </body>
 

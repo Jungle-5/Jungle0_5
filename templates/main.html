@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메인페이지</title>
+
+    <!-- jQuery 를 포함합니다. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- CSS library 인 Bulma 를 포함합니다. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
+
+    <!-- 텍스트형태로 되어있는 icon 을 쓸 수 있도록 Font awesome 을 포함하빈다. -->
+    <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
+
+    <style>
+        .column {
+            width: 800px;
+            height: 200px;
+            margin: 15px;
+
+        }
+
+        .image {
+            width: 170px;
+            height: 170px;
+        }
+
+        .media-right {
+            width: 100px;
+            display: flex;
+            flex-direction: column;
+
+        }
+
+        .wowImage {
+            width: 30px;
+            height: 30px;
+        }
+
+        .nameInfo {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .suggestor {
+            display: flex;
+        }
+    </style>
+    <script>
+        function searchPosts(pageNumber) {
+            const countPerPage = 10;
+            const start = (pageNumber - 1) * 10;
+            console.log(countPerPage, start);
+
+
+
+        }
+
+        function addProduct(isWow) {
+            var url = $('#url').val()
+            var minNum = $("select :selected").val();
+            console.log(url)
+            console.log(minNum)
+            console.log(isWow)
+        }
+
+        function is_checked() {
+            // 1. checkbox element를 찾습니다.
+            const checkbox = document.getElementById('my_checkbox');
+            // 2. checked 속성을 체크합니다.
+            return checkbox.checked;
+        }
+
+
+
+    </script>
+</head>
+
+<body>
+    <div class="card">
+        <header class="card-header">
+            <p class="card-header-title">
+                등록하기
+            </p>
+        </header>
+        <div class="card-content">
+            <div class="content">
+                <label class="label">쿠팡 URL</label>
+                <div class="control">
+                    <input class="input" id="url"
+                        placeholder="e.g. https://www.coupang.com/vp/products/7121221655?itemId=">
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">최소인원</label>
+                <div class="select" id="minNumber">
+                    <select>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                    </select>
+                </div>
+            </div>
+            <label class="checkbox">
+                <input type="checkbox" id="my_checkbox" onclick="is_checked()">
+                와우 회원 여부
+            </label>
+        </div>
+    </div>
+    <footer class="card-footer">
+        <a href="#" class="card-footer-item">취소하기</a>
+        <a href="#" onclick="addProduct(is_checked())" class="card-footer-item">등록하기</a>
+    </footer>
+    </div>
+
+
+    <div class="title">메인 페이지</div>
+
+    <div class="column" style="background-color: #E9E9E9;">
+        <div class="media">
+            <div class="media-left">
+                <figure class="image">
+                    <img src="https://bulma.io/images/placeholders/96x96.png" alt="">
+                </figure>
+            </div>
+            <div class="media-content">
+                <div class="nameInfo">
+                    <div class="title">Macbook Air</div>
+
+                </div>
+                <p class="subtitle">1,415,200원</p>
+                <p class="participant" onclick="alert('참여인원출력')">2 / 10명</p>
+                <p class="date">만료 3일전 </p>
+            </div>
+            <div class="media-right">
+                <div class="suggestor">
+                    <div class="wowImage"><img src="/Users/kimhyeokjoon/Jungle/project/_049/static/로켓_icon.png" alt="">
+                    </div>
+                    <div class="suggestorName">심우정</div>
+                </div>
+                <button class="button is-primary">참여</button>
+                <button class="button is-danger">취소</button>
+            </div>
+        </div>
+    </div>
+    <button onclick="addProduct()">+</button>
+
+    <nav class="pagination" role="navigation" aria-label="pagination">
+        <!-- <a class="pagination-previous">Previous</a>
+        <a class="pagination-next">Next page</a> -->
+        <ul class="pagination-list">
+            <li>
+                <a class="pagination-link" aria-label="Goto page 1">1</a>
+            </li>
+            <li>
+                <span class="pagination-ellipsis">&hellip;</span>
+            </li>
+            <li>
+                <a class="pagination-link" aria-label="Goto page 45">45</a>
+            </li>
+            <li>
+                <a class="pagination-link is-current" aria-label="Page 46" aria-current="page">46</a>
+            </li>
+            <li>
+                <a class="pagination-link" aria-label="Goto page 47">47</a>
+            </li>
+            <li>
+                <span class="pagination-ellipsis">&hellip;</span>
+            </li>
+            <li>
+                <a class="pagination-link" aria-label="Goto page 86">86</a>
+            </li>
+        </ul>
+    </nav>
+</body>
+
+</html>

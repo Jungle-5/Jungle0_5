@@ -19,7 +19,9 @@
 
     <script>
         // 로그인 기능
-        function logIn(uid, pw) {
+        function logIn() {
+            var uid = console.log($('#id').val())
+            var pw = console.log($('#PW').val())
             alert('login start')
             $.ajax({
                 type: "POST",
@@ -64,7 +66,7 @@
                 </div>
 
             </div>
-            <button onclick="logIn('ID','PW')" class="button is-primary">로그인</button>
+            <button onclick="logIn()" class="button is-primary">로그인</button>
 
         </form>
         <button onclick="location.href='signUp.html'" class="button is-primary">회원가입</button>
