@@ -23,7 +23,6 @@
             var pw = $('#pw').val()
             var name = $('#name').val()
             var phoneNum = $('#phoneNumber').val()
-            window.location.href = 'login.html';
             $.ajax({
                 type: "POST",
                 url: "/api/signup",
@@ -32,17 +31,15 @@
                     if (response['result'] == 'success') {
                         // '가입 완료' 얼럿을 띄웁니다.
                         alert('회원가입 성공')
-                        // 메인 페이지로 이동합니다.
-                        window.location.href = 'login.html';
+                        // 로그인 페이지로 이동합니다.
+                        window.location.href = '/toLogin';
                     }
                     else {
                         alert('회원가입 실패')
-                    }
-
+                    }  
                 }
             });
         }
-
         function checkDuplicate() {
             var inputId = $('#inputId').val()
             $.ajax({
