@@ -33,7 +33,7 @@
                         document.cookie = 'usertoken=' + response['token'] + '; path=/';
                         alert('로그인 완료')
                         // 메인 페이지로 이동합니다.
-                        window.location.href = 'https://naver.com';
+                        window.location.href = '/toMain';
                     } else {
                         alert('로그인 실패')
                     }
@@ -71,9 +71,10 @@
                 </div>
 
             </div>
-            <button onclick="logIn()" class="button is-primary">로그인</button>
+            <button onclick="logIn()" type="button" class="button is-primary">로그인</button>
 
         </form>
+        <button onclick="window.location.href = '/toSignUp'" class="button is-primary">회원가입</button>
         <button onclick="signUpPage()" class="button is-primary">회원가입</button>
 
     </div>

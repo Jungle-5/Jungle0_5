@@ -16,7 +16,7 @@ import hashlib, datetime, jwt
 app = Flask(__name__)
 
 client = MongoClient('localhost', 27017)
-db = client.O49
+db = client.gonggu
 
 SECRET_KEY = 'SECRETT'
 
@@ -29,7 +29,7 @@ def api_register():
     print('id: '+id_receive+' pw: '+pw_receive+' name: '+name_receive+' phone: '+phone_receive)
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest() #해시 함수 sha256(단방향) 사용해 암호화
     
-    db.users.insert_one({'uid': id_receive, 'pw': pw_hash, 'uname': name_receive, 'phoneNum': phone_receive})
+    result = db.users.insert_one({'uid': id_receive, 'pw': pw_hash, 'uname': name_receive, 'phoneNum': phone_receive})
 
     return jsonify({'result': 'success'})
 
@@ -56,6 +56,18 @@ def api_login():
 
 @app.route('/')
 def home():
+    return render_template('logIn.html')
+
+@app.route('/toMain')
+def toMain():
+    return render_template('main.html')
+
+@app.route('/toLogin')
+def toLogin():
+    return render_template('logIn.html')
+
+@app.route('/toSignUp')
+def toSignUp():
     return render_template('signUp.html')
 
 if __name__ == '__main__':
