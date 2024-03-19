@@ -47,12 +47,28 @@
             <h1>공구할 사람 구함</h1>
         </div>
 
-        <div class="inputContainer">
-            <p>ID: <input type="text" id="ID"></p>
-            <p>PW: <input type="password" id="PW"></p>
-        </div>
-        <div> <button onclick="logIn('ID','PW')">로그인</button> </div>
-        <a href="">회원가입</a>
+        <form class="box">
+            <div>
+                <div class="field">
+                    <label class="label">ID</label>
+                    <div class="control">
+                        <input class="input" type="id" id="id" placeholder="e.g. alex@example.com">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" id="PW" placeholder="********">
+                    </div>
+                </div>
+
+            </div>
+            <button onclick="logIn('ID','PW')" class="button is-primary">로그인</button>
+
+        </form>
+        <button onclick="location.href='signUp.html'" class="button is-primary">회원가입</button>
+
     </div>
 
 
