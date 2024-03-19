@@ -18,7 +18,26 @@
     <title>회원 가입 페이지</title>
 
     <script>
+        function signUp(uid, pw, name, phoneNum) {
+            window.location.href = 'login.html';
+            $.ajax({
+                type: "POST",
+                url: "/api/signup",
+                data: { uid: uid, pw: pw, name: name, phoneNum: phoneNum },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        // '가입 완료' 얼럿을 띄웁니다.
+                        alert('회원가입 성공')
+                        // 메인 페이지로 이동합니다.
+                        window.location.href = 'login.html';
+                    }
+                    else {
+                        alert('회원가입 실패')
+                    }
 
+                }
+            });
+        }
     </script>
 
 </head>
@@ -27,12 +46,12 @@
 
     <h1>회원 가입</h1>
     <div class="input_container">
-        <p>ID: <input type="text"> <button>중복 검사</button></p>
-        <p>PW: <input type="password"></p>
-        <p>이름: <input type="text" class="name"></p>
-        <p>전화번호: <input type="text" class="phoneNumber"></p>
+        <p>ID: <input type="text" id="id"> <button>중복 검사</button></p>
+        <p>PW: <input type="password" id="pw"></p>
+        <p>이름: <input type="text" id="name"></p>
+        <p>전화번호: <input type="text" id="phoneNumber"></p>
     </div>
-    <button>회원가입</button>
+    <button onclick="signUp('id','pw','name','phoneNumber')">회원가입</button>
 
 </body>
 
