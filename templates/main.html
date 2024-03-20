@@ -151,10 +151,11 @@
             }
         }
         function showList() {
+            var uid = getCookie();
             $('#list-box').empty()
             $.ajax({
                 type: "GET",
-                url: "/api/list",
+                url: "/api/list?uid=" + uid,
                 data: {},
                 success: function (response) {
                     if (response['result'] != 'success') {
