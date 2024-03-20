@@ -65,6 +65,7 @@
     </style>
     <script>
         showList();
+
         function searchPosts(pageNumber) {
             const countPerPage = 10;
             const start = (pageNumber - 1) * 10;
@@ -83,11 +84,12 @@
                     if (response['result'] == 'success') {
                         alert('등록 완료')
                         openclose()
+                        showList()
                     } else {
                         alert('등록 실패')
                     }
                 },
-                error: function(request, status, error){
+                error: function (request, status, error) {
                     console.log("code: " + request.status)
                     console.log("message: " + request.responseText)
                     console.log("error: " + error);
@@ -105,7 +107,7 @@
             return checkbox.checked;
         }
 
-      
+
         function getCookie() {
             var cookieString = document.cookie; //쿠키 다 가져옴
             console.log(cookieString)
@@ -119,13 +121,13 @@
 
                     const decodedPayload = JSON.parse(
                         decodeURIComponent(
-                        window.atob(payload[1]).split('').map(function (c) {
-                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                            window.atob(payload[1]).split('').map(function (c) {
+                                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                             })
-                            .join('')
-	                    )
+                                .join('')
+                        )
                     );
-                    console.log('decode: ',decodedPayload); // uid와 exp 들어있음
+                    console.log('decode: ', decodedPayload); // uid와 exp 들어있음
                     console.log('uid: ', decodedPayload.uid);
                     return decodedPayload.uid;
                 }
@@ -137,6 +139,7 @@
         function changeVisability() {
 
         }
+
         function openclose() {
             let status = $('#card').css('display')
             if (status == 'none') {
@@ -148,9 +151,11 @@
             }
         }
         function showList() {
+            var uid = getCookie();
+            $('#list-box').empty()
             $.ajax({
                 type: "GET",
-                url: "/api/list",
+                url: "/api/list?uid=" + uid,
                 data: {},
                 success: function (response) {
                     //console.log('showList success')
@@ -176,10 +181,12 @@
                 let date = list['date']
                 let pname = list['pname']
                 let sname = list['sname']
+                let joined = list['joined']
                 let price = list['price'].toLocaleString()
 
+
                 let cardHtml = ''
-                if (trashMode == false) {
+                if (joined == false) {
                     cardHtml = `
                     <div class="column" style="background-color: #E9E9E9;">
                         <div>${state}</div>
@@ -255,7 +262,7 @@
         function cancel() {
 
         }
-      
+
     </script>
 </head>
 

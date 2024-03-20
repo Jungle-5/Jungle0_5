@@ -5,11 +5,274 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+
+
+    <!-- jQuery 를 포함합니다. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- CSS library 인 Bulma 를 포함합니다. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
+
+    <!-- 텍스트형태로 되어있는 icon 을 쓸 수 있도록 Font awesome 을 포함하빈다. -->
+    <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
+
+    <title>마이 페이지</title>
+    <style>
+        .container {
+            display: flex;
+        }
+
+        .btn btn-primary {
+            color: beige;
+        }
+
+        .tabs is-right {
+            padding: 20px;
+        }
+
+        .gap {
+            width: 20px;
+        }
+
+        .userInfo {
+            background-color: beige;
+            width: 250px;
+            height: 1000px;
+        }
+    </style>
+    <script>
+        const Selector = {
+            MY_SUGGEST: "suggestor",
+            JOINED: "joined",
+            COMPLETED: "completed",
+        };
+        let selectMode = Selector.MY_SUGGEST
+
+        $(document).ready(function () {
+            // 리스트를 보여줍니다.
+            showList()
+
+        });
+
+
+
+        // 리스트 버튼을 클릭하면 호출됨
+        function changeSelector(newMode) {
+            // console.log(newMode)
+            if (selectMode == newMode) {
+                return
+            }
+
+            selectMode = newMode
+            displaySelector(selectMode)
+            showList()
+        }
+
+        function showList() {
+            $('#list-box').empty()
+            $.ajax({
+                type: "GET",
+                url: "/api/list",
+                data: {},
+                success: function (response) {
+                    if (response['result'] != 'success') {
+                        alert('받아오기 실패')
+                    }
+                    let lists = response['list']
+                    addProductCards(lists)
+                },
+            })
+        }
+
+        function addProductCards(lists) {
+            $('#list-box').empty()
+            for (let i = 0; i < lists.length; i++) {
+                let list = lists[i]
+
+                //  state, url, pname, price, curNum, minNum, date, sname, phoneNum
+                let state = list['state']
+                let thumbnail = list['url']
+                let curNum = list['curNum'].toLocaleString()
+                let minNum = list['minNum'].toLocaleString()
+                let date = list['date']
+                let pname = list['pname']
+                let sname = list['sname']
+                let joined = list['joined']
+                let price = list['price'].toLocaleString()
+
+
+                let cardHtml = ''
+                if (joined == '3') {
+                    cardHtml = `
+                    <div class="column" style="background-color: #E9E9E9;">
+                        <div>${state}</div>
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image">
+                                    <img src="${thumbnail}" alt="">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <div class="nameInfo">
+                                    <div class="title">${pname}</div>
+
+                                </div>
+                                <p class="subtitle">${price}원</p>
+                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="date">만료 ${date}일전 </p>
+                            </div>
+                            <div class="media-right">
+                                <div class="suggestor">
+                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    </div>
+                                    <div class="suggestorName">${sname}</div>
+                                </div>
+                                <button class="button is-primary" onclick="join()">참여</button>
+                            </div>
+                        </div>
+                    </div>
+                        `
+                } else if (joined == '2') {
+                    cardHtml = `
+                    <div class="column" style="background-color: #E9E9E9;">
+                        <div>${state}</div>
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image">
+                                    <img src="${thumbnail}" alt="">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <div class="nameInfo">
+                                    <div class="title">${pname}</div>
+
+                                </div>
+                                <p class="subtitle">${price}원</p>
+                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="date">만료 ${date}일전 </p>
+                            </div>
+                            <div class="media-right">
+                                <div class="suggestor">
+                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    </div>
+                                    <div class="suggestorName">${sname}</div>
+                                </div>
+                                <button class="button is-danger" onclick="cancel()">취소</button>
+                            </div>
+                        </div>
+                    </div>
+                        `
+                } else {
+                    cardHtml = `
+                    <div class="column" style="background-color: #E9E9E9;">
+                        <div>${state}</div>
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image">
+                                    <img src="${thumbnail}" alt="">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <div class="nameInfo">
+                                    <div class="title">${pname}</div>
+
+                                </div>
+                                <p class="subtitle">${price}원</p>
+                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="date">만료 ${date}일전 </p>
+                            </div>
+                            <div class="media-right">
+                                <div class="suggestor">
+                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    </div>
+                                    <div class="suggestorName">${sname}</div>
+                                </div>
+                                <button class="button is-danger" onclick="cancel()">삭제</button>
+                            </div>
+                        </div>
+                    </div>
+                        `
+                }
+
+                // 4. #movie-box에 생성된 HTML 을 붙입니다.
+                $('#movie-box').append(`
+                        <div class="card">
+                            ${cardHtml}
+                        </div>
+                    `)
+            }
+        }
+
+        // 리스트 기준에 따라 해당 버튼만 활성화 시키고 다른 버튼은 비활성화 시킴
+        function displaySelector(selectMode) {
+            document.getElementById("suggestor").classList.remove("is-active")
+            document.getElementById("joined").classList.remove("is-active")
+            document.getElementById("completed").classList.remove("is-active")
+            document.getElementById(selectMode).classList.add("is-active")
+        }
+
+
+        function showUserInfo() {
+            $.ajax({
+                type: "GET",
+                url: "/api/user/info",
+                data: {},
+                success: function (response) {
+                    if (response['result'] != 'success') {
+                        alert('받아오기 실패')
+                    }
+                    let info = response['info']
+                    showUserCards(info)
+                },
+            })
+        }
+        function makeUserCards(info) {
+            let name = list['uname']
+            let id = list['id']
+            let phoneNum = list['phoneNum']
+            let cardHtml = ''
+            cardHtml = `
+                    
+                    `
+        }
+
+        function logout() {
+            alert('로그아웃 되었습니다.')
+        }
+
+    </script>
 </head>
 
 <body>
-    
+    <div class="container">
+        <div class="userInfo">
+            <p>이름 : 심우정</p>
+            <p>ID : dnwjd</p>
+            <p>전화번호 : 010-0000-0000</p>
+            <button onclick="logout()" type="button" class="button is-primary">로그아웃</button>
+        </div>
+        <div class="gap"></div>
+        <div class="itemList">
+            <div class="tabs is-right">
+                <ul>
+                    <li class="is-active" id="suggestor"><a href="#" class="btn btn-primary"
+                            onclick="changeSelector('suggestor')">내가 제안한
+                            공구</a></li>
+                    <li id="joined"><a href="#" class="btn btn-primary" onclick="changeSelector('joined')">내가 참여한
+                            공구</a></li>
+                    <li id="completed"><a href="#" class="btn btn-primary" onclick="changeSelector('completed')">완료
+                            내역</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="listbox" id="list-box">
+                <h1>여기에 리스트</h1>
+            </div>
+        </div>
+
+
+    </div>
 </body>
 
 </html>
