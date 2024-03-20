@@ -99,8 +99,16 @@ def showlist():
     uid = request.args.get('uid')
     products = list(db.products.find({}).sort("date"))
     for data in products:
+        now = datetime.datetime.now()
+        data['date'] = (data['date'] - now).days
+        if data['date'] < 0:
+            db.products.delete_one({'pid':pid})
+            db.party.delete_one({'pid':pid})
+            products.remove(data)
+            continue
         pid = data['_id']
         curNum = len(list(db.party.find({'pid':pid})))
+        data['curNum']=curNum
         if data['sid'] == uid:
             joined = 1
         ### 제안자면 joined == 1
@@ -110,17 +118,10 @@ def showlist():
         else:
             joined = 3
         ### 참여 안한 구매자면 joined == 3
-        data['curNum']=curNum
-        data['_id'] = str(data['_id'])
-        now = datetime.datetime.now()
-        data['date'] = (data['date'] - now).days
-        if data['date'] < 0:
-            db.products.delete_one({'pid':pid})
-            db.party.delete_one({'pid':pid})
-            products.remove(data)
-            continue
-            
         data['joined'] = joined
+        data['_id'] = str(data['_id'])
+        sname = db.users.find_one({'uid':data['sid']})['uname']
+        data['sname'] = sname
 
     print(products[0])
     return jsonify({'result': 'success', 'list': products})
