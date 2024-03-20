@@ -140,6 +140,30 @@ def showlist():
 
     return jsonify({'result': 'success', 'list': products})
 
+
+@app.route('/api/delete/product', methods=['POST'])
+def delete():
+    pid = request.form['pid']
+    uid = request.form['uid']
+    res1 = db.products.delete_one({'_id': ObjectId(pid)})
+    res2 = db.party.delete_many({'pid':pid})
+
+    return jsonify({'result':'success'})
+
+      
+@app.route('/api/party/cancel', methods=['POST'])
+def cancel():
+    pid = request.form['pid']
+    uid = request.form['uid']
+
+    result = db.party.delete_one({'pid': pid, 'uid': uid})
+    if result.deleted_count:
+        return jsonify({'result': 'success'})
+    else:
+        return jsonify({'result': 'failure'})
+
+        
+
 @app.route('/api/party', methods=['POST'])
 def participate():
     print("참여 과정 시작!")
@@ -311,7 +335,7 @@ def check():
 
 if __name__ == '__main__':
     print(sys.executable)
-    app.run('0.0.0.0', port=5000, debug=True)
+    app.run('0.0.0.0', port=5001, debug=True)
 
 @app.route('/api/complete', methods=['POST'])
 def complete():
@@ -334,17 +358,7 @@ def complete():
     else:
         return jsonify({'result': 'failure'})
 
-      
-@app.route('/api/party/cancel', methods=['POST'])
-def cancel():
-    pid = request.form['pid']
-    uid = request.form['uid']
 
-    result = db.party.delete_one({'pid': pid, 'uid': uid})
-    if result.deleted_count:
-        return jsonify({'result': 'success'})
-    else:
-        return jsonify({'result': 'failure'})
 
 
 @app.route('/api/buy/', methods=['POST'])
@@ -355,12 +369,3 @@ def buy():
         return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})
-
-@app.route('/api/delete/product', methods=['POST'])
-def delete():
-    pid = request.form['pid']
-    uid = request.form['uid']
-    res1 = db.products.delete_one({'_id':pid})
-    res2 = db.party.delete_many({'pid':pid})
-
-    return jsonify({'result':'success'})
