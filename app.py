@@ -164,8 +164,8 @@ def delete():
 def cancel():
     pid = request.form['pid']
     uid = request.form['uid']
-
-    result = db.party.delete_one({'pid': pid, 'uid': uid})
+    print(db.party.find_one({'pid':str(pid),'uid':uid}))
+    result = db.party.delete_one({'pid': str(pid), 'uid': uid})
     if result.deleted_count:
         return jsonify({'result': 'success'})
     else:
@@ -206,7 +206,7 @@ def mylist():
         product = list(db.products.find({'sid':uid}))
         for data in product:
             pid = str(data['_id'])
-            data.pop('_id', None)
+            data['_id']=pid
             now = datetime.datetime.now()
             data['date'] = (data['date'] - now).days
             if data['date'] < 0:
@@ -239,7 +239,7 @@ def mylist():
             print(type(product))
             now = datetime.datetime.now()
             product['date'] = (product['date'] - now).days
-            product.pop('_id', None)
+            product['_id']=pid
             product['curNum'] = curNum
             sid = product['sid']
             sname = db.users.find_one({'uid':sid})['uname']
