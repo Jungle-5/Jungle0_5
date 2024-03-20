@@ -73,13 +73,13 @@
         }
 
         function addProduct(isWow) {
-            var url = $('#url').val()
+            var url = $('#url').val();
             var minNum = $("select :selected").val();
             var uid = getCookie();
             $.ajax({
                 type: "POST",
-                url: '/api/add/product',
-                data: { 'url': url, 'minNum': minNum, 'wow': isWow, 'uid': uid },//'uid': uid
+                url: '/api/add/product', //,'uid': uid
+                data: { 'url': url, 'minNum': minNum, 'wow': isWow,'uid': uid},
                 success: function (response) {
                     if (response['result'] == 'success') {
                         alert('등록 완료')
@@ -157,6 +157,7 @@
                 url: "/api/list?uid=" + uid,
                 data: {},
                 success: function (response) {
+                    //console.log('showList success')
                     if (response['result'] != 'success') {
                         alert('받아오기 실패')
                     }

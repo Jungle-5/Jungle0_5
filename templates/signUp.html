@@ -23,22 +23,31 @@
             var pw = $('#pw').val()
             var name = $('#name').val()
             var phoneNum = $('#phoneNumber').val()
-            $.ajax({
-                type: "POST",
-                url: "/api/signup",
-                data: { 'uid': uid, 'pw': pw, 'name': name, 'phoneNum': phoneNum },
-                success: function (response) {
-                    if (response['result'] == 'success') {
-                        // '가입 완료' 얼럿을 띄웁니다.
-                        alert('회원가입 성공')
-                        // 로그인 페이지로 이동합니다.
-                        window.location.href = '/toLogin';
-                    }
-                    else {
-                        alert('회원가입 실패')
-                    }
+            
+            if(uid == '' || pw == '' || name == '' || phoneNum == ''){
+                alert('빈칸이 존재합니다.')
+            }else{
+                if(duplicateFlag() == true){
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/signup",
+                        data: { 'uid': uid, 'pw': pw, 'name': name, 'phoneNum': phoneNum },
+                        success: function (response) {
+                            if (response['result'] == 'success') {
+                                // '가입 완료' 얼럿을 띄웁니다.
+                                alert('회원가입 성공')
+                                // 로그인 페이지로 이동합니다.
+                                window.location.href = '/toLogin';
+                            }
+                            else {
+                                alert('회원가입 실패')
+                            }  
+                        }
+                    });
+                }else{
+                    alert('중복검사를 진행해주세요.')
                 }
-            });
+            }
         }
         let dup = false;
         function duplicateFlag() {
@@ -46,27 +55,23 @@
         }
 
         function checkDuplicate() {
-            var inputId = $('#inputId').val()
+            var inputId = $('#id').val()
             $.ajax({
                 type: "POST",
                 url: "/api/check/Duplicate",
                 data: { 'inputId': inputId },
                 success: function (response) {
-                    if (response.cnt == true) {
+                    if (response['result'] == 'failure') {
                         alert("아이디가 존재합니다. 다른 아이디를 입력해주세요.");
                         dup = false;
-
-                        //아이디 입력 박스 빨간색
-
+                        $('#id').val('')
                     } else {
                         alert("사용가능한 아이디입니다.");
                         dup = true;
-                        //아이디 입력 박스 파란색
-
                     }
                 }
             });
-        }
+        }ß
 
     </script>
 
@@ -82,7 +87,7 @@
                     <input class="input" type="id" id="id" placeholder="ID">
                 </div>
                 <label class="checkbox">
-                    <input type="checkbox"><button onclick="checkDuplicate()">중복 검사</button>
+                    <button onclick="checkDuplicate()" type="button">중복 검사</button>
                 </label>
             </div>
 
@@ -102,7 +107,7 @@
             <div class="field">
                 <label class="label">전화번호</label>
                 <div class="control">
-                    <input class="input" id="phoneNumber" placeholder="(-)없이 입력)">
+                    <input class="input" id="phoneNumber" placeholder="(-)없이 입력">
                 </div>
             </div>
 
