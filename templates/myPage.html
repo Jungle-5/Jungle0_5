@@ -54,7 +54,33 @@
 
         });
 
+        function getCookie() {
+            var cookieString = document.cookie; //쿠키 다 가져옴
+            console.log(cookieString)
+            var cookies = cookieString.split(';'); //;를 기준으로 쿠키 나누기
+            for (var i = 0; i < cookies.length; i++) { // 쿠키 배열을 순회하며 usertoken에 해당하는 쿠키를 찾음
+                var cookie = cookies[i].trim();
+                if (cookie.indexOf('usertoken') === 0) { // 현재 쿠키가 원하는 이름을 가지고 있는지 확인
+                    userToken = cookie.substring('usertoken'.length + 1);
+                    var payload = userToken.split('.'); //usertoken에서 .을 기준으로 나눠 payload 뽑아내기
+                    //token이 header.payload.signiture니까 payload[1]
 
+                    const decodedPayload = JSON.parse(
+                        decodeURIComponent(
+                            window.atob(payload[1]).split('').map(function (c) {
+                                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                            })
+                                .join('')
+                        )
+                    );
+                    console.log('decode: ', decodedPayload); // uid와 exp 들어있음
+                    console.log('uid: ', decodedPayload.uid);
+                    return decodedPayload.uid;
+                }
+            }
+            // usertoken 쿠키가 없으면 빈 문자열 반환
+            return "";
+        }
 
         // 리스트 버튼을 클릭하면 호출됨
         function changeSelector(newMode) {
@@ -69,10 +95,11 @@
         }
 
         function showList() {
+            var uid = getCookie();
             $('#list-box').empty()
             $.ajax({
                 type: "GET",
-                url: "/api/list",
+                url: "/api/list?uid=" + uid,
                 data: {},
                 success: function (response) {
                     if (response['result'] != 'success') {
