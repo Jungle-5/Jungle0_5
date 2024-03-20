@@ -25,7 +25,7 @@ def insert_prod():
     url_receive = request.form['url']
     wow = request.form['wow']
     minNum = request.form['minNum']
-    sid = 'abcd'
+    sid = request.form['uid']
 
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36', "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"}
     response = requests.get(url_receive, headers=headers)
@@ -45,6 +45,7 @@ def insert_prod():
 
     now = datetime.datetime.now()
     date = now + datetime.timedelta(days=7)
+
     result = db.products.insert_one({'url':url_receive, 'price':price,'imgurl':img,'pname':pname, 'minNum':minNum, 'state':'모집 중', 'sid':sid, 'date':date})
     pid = result.inserted_id
     db.party.insert_one({'pid':pid, 'uid':sid})
@@ -57,10 +58,12 @@ def insert_prod():
 def showlist():
     products = list(db.products.find({}).sort("date"))
     for i in range(len(products)):
-        pid = str(products[i]['_id'])
+        pid = products[i]['_id']
         curNum = len(list(db.party.find({'pid':pid})))
         products[i]['curNum']=curNum
         products[i]['_id'] = str(products[i]['_id'])
+        now = datetime.datetime.now()
+        products[i]['date'] = (products[i]['date'] - now).days
     
     print(products[0])
     
