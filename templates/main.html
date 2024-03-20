@@ -65,6 +65,7 @@
     </style>
     <script>
         showList();
+
         function searchPosts(pageNumber) {
             const countPerPage = 10;
             const start = (pageNumber - 1) * 10;
@@ -114,6 +115,7 @@
             }
         }
         function showList() {
+            $('#list-box').empty()
             $.ajax({
                 type: "GET",
                 url: "/api/list",
