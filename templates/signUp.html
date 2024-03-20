@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- jQuery 를 포함합니다. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- CSS library 인 Bulma 를 포함합니다. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
+
+    <!-- 텍스트형태로 되어있는 icon 을 쓸 수 있도록 Font awesome 을 포함하빈다. -->
+    <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
+
+    <title>회원 가입 페이지</title>
+
+    <script>
+        function signUp() {
+            var uid = $('#id').val()
+            var pw = $('#pw').val()
+            var name = $('#name').val()
+            var phoneNum = $('#phoneNumber').val()
+            $.ajax({
+                type: "POST",
+                url: "/api/signup",
+                data: { 'uid': uid, 'pw': pw, 'name': name, 'phoneNum': phoneNum },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        // '가입 완료' 얼럿을 띄웁니다.
+                        alert('회원가입 성공')
+                        // 로그인 페이지로 이동합니다.
+                        window.location.href = '/toLogin';
+                    }
+                    else {
+                        alert('회원가입 실패')
+                    }  
+                }
+            });
+        }
+        let dup = false;
+        function duplicateFlag() {
+            return dup;
+        }
+
+        function checkDuplicate() {
+            var inputId = $('#inputId').val()
+            $.ajax({
+                type: "POST",
+                url: "/api/check/Duplicate",
+                data: { 'inputId': inputId },
+                success: function (response) {
+                    if (response.cnt == true) {
+                        alert("아이디가 존재합니다. 다른 아이디를 입력해주세요.");
+                        dup = false;
+
+                        //아이디 입력 박스 빨간색
+
+
+                    } else {
+                        alert("사용가능한 아이디입니다.");
+                        dup = true;
+                        //아이디 입력 박스 파란색
+                        $
+                    }
+                }
+            });
+        }
+
+    </script>
+
+</head>
+
+<body>
+    <div class="title">회원가입</div>
+    <form class="box">
+        <div>
+            <div class="field">
+                <label class="label">ID</label>
+                <div class="control">
+                    <input class="input" type="id" id="id" placeholder="ID">
+                </div>
+                <label class="checkbox">
+                    <input type="checkbox"><button onclick="checkDuplicate()">중복 검사</button>
+                </label>
+            </div>
+
+            <div class="field">
+                <label class="label">Password</label>
+                <div class="control">
+                    <input class="input" type="password" id="pw" placeholder="********">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">이름</label>
+                <div class="control">
+                    <input class="input" id="name" placeholder="공사구">
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">전화번호</label>
+                <div class="control">
+                    <input class="input" id="phoneNumber" placeholder="(-)없이 입력)">
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+
+    <button onclick="signUp()" class="button is-primary">회원 가입</button>
+
+</body>
+
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>메인페이지</title>
+
+    <!-- jQuery 를 포함합니다. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- CSS library 인 Bulma 를 포함합니다. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
+
+    <!-- 텍스트형태로 되어있는 icon 을 쓸 수 있도록 Font awesome 을 포함하빈다. -->
+    <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
+
+    <style>
+        .column {
+            width: 800px;
+            height: 200px;
+            margin: 15px;
+
+        }
+
+        .image {
+            width: 170px;
+            height: 170px;
+        }
+
+        .media-right {
+            width: 100px;
+            display: flex;
+            flex-direction: column;
+
+        }
+
+        .media {
+            width: inherit;
+        }
+
+        .wowImage {
+            width: 30px;
+            height: 30px;
+        }
+
+        .nameInfo {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .suggestor {
+            display: flex;
+        }
+
+        .column {
+            display: flex;
+        }
+
+        .card {
+            display: none;
+        }
+    </style>
+    <script>
+        showList();
+
+        function searchPosts(pageNumber) {
+            const countPerPage = 10;
+            const start = (pageNumber - 1) * 10;
+            console.log(countPerPage, start);
+        }
+
+        function addProduct(isWow) {
+            var url = $('#url').val()
+            var minNum = $("select :selected").val();
+            $.ajax({
+                type: 'POST',
+                url: '/api/add/product',
+                data: { 'url': url, 'minNum': minNum, 'wow': isWow },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert('등록 완료')
+                        openclose()
+                        showList()
+                    } else {
+                        alert('등록 실패 ')
+                    }
+                }
+            })
+            console.log(url)
+            console.log(minNum)
+            console.log(isWow)
+        }
+
+        function is_checked() {
+            // 1. checkbox element를 찾습니다.
+            const checkbox = document.getElementById('my_checkbox');
+            // 2. checked 속성을 체크합니다.
+            return checkbox.checked;
+        }
+
+        function changeVisability() {
+
+        }
+        function openclose() {
+            let status = $('#card').css('display')
+            if (status == 'none') {
+                $('#card').show()
+                // $('#posting-box-btn').text('포스팅박스 열기')
+            } else {
+                $('#card').hide()
+                // $('#posting-box-btn').text('포스팅박스 닫기')
+            }
+        }
+        function showList() {
+            $('#list-box').empty()
+            $.ajax({
+                type: "GET",
+                url: "/api/list",
+                data: {},
+                success: function (response) {
+                    if (response['result'] != 'success') {
+                        alert('받아오기 실패')
+                    }
+                    let lists = response['list']
+                    addProductCards(lists)
+                },
+            })
+        }
+        function addProductCards(lists) {
+            $('#list-box').empty()
+            for (let i = 0; i < lists.length; i++) {
+                let list = lists[i]
+
+                //  state, url, pname, price, curNum, minNum, date, sname, phoneNum
+                let state = list['state']
+                let thumbnail = list['url']
+                let curNum = list['curNum'].toLocaleString()
+                let minNum = list['minNum'].toLocaleString()
+                let date = list['date']
+                let pname = list['pname']
+                let sname = list['sname']
+                let price = list['price'].toLocaleString()
+
+                let cardHtml = ''
+                if (trashMode == false) {
+                    cardHtml = `
+                    <div class="column" style="background-color: #E9E9E9;">
+                        <div>${state}</div>
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image">
+                                    <img src="${thumbnail}" alt="">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <div class="nameInfo">
+                                    <div class="title">${pname}</div>
+
+                                </div>
+                                <p class="subtitle">${price}원</p>
+                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="date">만료 ${date}일전 </p>
+                            </div>
+                            <div class="media-right">
+                                <div class="suggestor">
+                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    </div>
+                                    <div class="suggestorName">${sname}</div>
+                                </div>
+                                <button class="button is-primary" onclick="join()">참여</button>
+                            </div>
+                        </div>
+                    </div>
+                        `
+                } else {
+                    cardHtml = `
+                    <div class="column" style="background-color: #E9E9E9;">
+                        <div>${state}</div>
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image">
+                                    <img src="${thumbnail}" alt="">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <div class="nameInfo">
+                                    <div class="title">${pname}</div>
+
+                                </div>
+                                <p class="subtitle">${price}원</p>
+                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="date">만료 ${date}일전 </p>
+                            </div>
+                            <div class="media-right">
+                                <div class="suggestor">
+                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    </div>
+                                    <div class="suggestorName">${sname}</div>
+                                </div>
+                                <button class="button is-danger" onclick="cancel()">취소</button>
+                            </div>
+                        </div>
+                    </div>
+                        `
+                }
+
+                // 4. #movie-box에 생성된 HTML 을 붙입니다.
+                $('#movie-box').append(`
+                        <div class="card">
+                            ${cardHtml}
+                        </div>
+                    `)
+            }
+        }
+        function join() {
+
+        }
+        function cancel() {
+
+        }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar is-transparent">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://bulma.io">
+                <img src="static/로켓_icon.png" width="112" height="28">
+            </a>
+            <div class="navbar-burger" data-target="navbarExampleTransparentExample">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <div id="navbarExampleTransparentExample" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item" href="https://bulma.io/">
+                    Home
+                </a>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link" href="https://bulma.io/documentation/overview/start/">
+                        Docs
+                    </a>
+                    <div class="navbar-dropdown is-boxed">
+                        <a class="navbar-item" href="https://bulma.io/documentation/overview/start/">
+                            Overview
+                        </a>
+                        <a class="navbar-item" href="https://bulma.io/documentation/overview/modifiers/">
+                            Modifiers
+                        </a>
+                        <a class="navbar-item" href="https://bulma.io/documentation/columns/basics/">
+                            Columns
+                        </a>
+                        <a class="navbar-item" href="https://bulma.io/documentation/layout/container/">
+                            Layout
+                        </a>
+                        <a class="navbar-item" href="https://bulma.io/documentation/form/general/">
+                            Form
+                        </a>
+                        <hr class="navbar-divider">
+                        <a class="navbar-item" href="https://bulma.io/documentation/elements/box/">
+                            Elements
+                        </a>
+                        <a class="navbar-item is-active" href="https://bulma.io/documentation/components/breadcrumb/">
+                            Components
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="field is-grouped">
+                        <p class="control">
+                            <a class="bd-tw-button button" data-social-network="Twitter" data-social-action="tweet"
+                                data-social-target="https://bulma.io" target="_blank"
+                                href="https://twitter.com/intent/tweet?text=Bulma: a modern CSS framework based on Flexbox&amp;hashtags=bulmaio&amp;url=https://bulma.io&amp;via=jgthms">
+                                <span class="icon">
+                                    <i class="fab fa-twitter"></i>
+                                </span>
+                                <span>
+                                    Tweet
+                                </span>
+                            </a>
+                        </p>
+                        <p class="control">
+                            <a class="button is-primary"
+                                href="https://github.com/jgthms/bulma/releases/download/0.9.4/bulma-0.9.4.zip">
+                                <span class="icon">
+                                    <i class="fas fa-download"></i>
+                                </span>
+                                <span>Download</span>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="title">메인 페이지</div>
+
+    <div class="listbox" id="list-box">
+    </div>
+
+
+
+    <button class="posting-box-btn" onclick="openclose()">+</button>
+
+    <div id="card" , class="card">
+        <header class="card-header">
+            <p class="card-header-title">
+                등록하기
+            </p>
+        </header>
+        <div class="card-content">
+            <div class="content">
+                <label class="label">쿠팡 URL</label>
+                <div class="control">
+                    <input class="input" id="url"
+                        placeholder="e.g. https://www.coupang.com/vp/products/7121221655?itemId=">
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">최소인원</label>
+                <div class="select" id="minNumber">
+                    <select>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                    </select>
+                </div>
+            </div>
+            <label class="checkbox">
+                <input type="checkbox" id="my_checkbox" onclick="is_checked()">
+                와우 회원 여부
+            </label>
+        </div>
+
+        <footer class="card-footer">
+            <a href="#" onclick="openclose()" class="card-footer-item">취소하기</a>
+            <a href="#" onclick="addProduct(is_checked())" class="card-footer-item">등록하기</a>
+        </footer>
+    </div>
+    </div>
+
+
+
+    <nav class="pagination" role="navigation" aria-label="pagination">
+        <!-- <a class="pagination-previous">Previous</a>
+        <a class="pagination-next">Next page</a> -->
+        <ul class="pagination-list">
+            <li>
+                <a class="pagination-link" aria-label="Goto page 1">1</a>
+            </li>
+            <li>
+                <span class="pagination-ellipsis">&hellip;</span>
+            </li>
+            <li>
+                <a class="pagination-link" aria-label="Goto page 45">45</a>
+            </li>
+            <li>
+                <a class="pagination-link is-current" aria-label="Page 46" aria-current="page">46</a>
+            </li>
+            <li>
+                <a class="pagination-link" aria-label="Goto page 47">47</a>
+            </li>
+            <li>
+                <span class="pagination-ellipsis">&hellip;</span>
+            </li>
+            <li>
+                <a class="pagination-link" aria-label="Goto page 86">86</a>
+            </li>
+        </ul>
+    </nav>
+</body>
+
+</html>
