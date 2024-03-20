@@ -252,12 +252,12 @@
                         alert('받아오기 실패')
                     }
                     let info = response['info']
-                    showUserCards(info)
+                    makeUserCards(info)
                 },
             })
         }
         function makeUserCards(info) {
-
+            console.log(info)
             let name = list['uname']
             let id = list['id']
             let phoneNum = list['phoneNum']
