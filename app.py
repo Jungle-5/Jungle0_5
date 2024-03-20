@@ -145,7 +145,7 @@ def showlist():
 def complete():
     pid = request.form['pid']
     product = db.products.find_one({'_id': ObjectId(pid)})
-    print(product)
+    print("product found : ", product)
     price = product['price']
     imgurl = product['imgurl']
     pname = product['pname']
@@ -153,13 +153,12 @@ def complete():
     date = datetime.datetime.now()
     phoneNum = db.users.find_one({'uid': uid})['phoneNum']
 
-    res1 = db.history.insert_one({'pid': pid, 'price': price, 'imgurl': imgurl,
+    db.history.insert_one({'pid': pid, 'price': price, 'imgurl': imgurl,
                                  'pname': pname, 'date': date, 'uid': uid, 'phoneNum': phoneNum})
-    ID = res1.inserted_id
-    print(db.products.find_one({'_id': ObjectId(ID)}))
+    print(db.history.find_one({'pid':pid}))
     res2 = db.products.delete_one({'pid': pid})
     delCount = res2.deleted_count
-    if db.products.find_one({'_id': ObjectId(ID)}):
+    if db.history.find_one({'pid':pid}):
         return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})
@@ -387,4 +386,4 @@ def check():
 
 if __name__ == '__main__':
     print(sys.executable)
-    app.run('0.0.0.0', port=5001, debug=True)
+    app.run('0.0.0.0', port=5000, debug=True)
