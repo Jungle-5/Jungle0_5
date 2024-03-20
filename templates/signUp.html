@@ -40,6 +40,11 @@
                 }
             });
         }
+        let dup = false;
+        function duplicateFlag() {
+            return dup;
+        }
+
         function checkDuplicate() {
             var inputId = $('#inputId').val()
             $.ajax({
@@ -47,12 +52,17 @@
                 url: "/api/check/Duplicate",
                 data: { 'inputId': inputId },
                 success: function (response) {
-                    if (response.cnt > 0) {
+                    if (response.cnt == true) {
                         alert("아이디가 존재합니다. 다른 아이디를 입력해주세요.");
+                        dup = false;
+
+                        //아이디 입력 박스 빨간색
+
 
                     } else {
                         alert("사용가능한 아이디입니다.");
-                        //체크박스 체크
+                        dup = true;
+                        //아이디 입력 박스 파란색
                         $
                     }
                 }
