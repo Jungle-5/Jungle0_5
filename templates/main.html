@@ -56,26 +56,30 @@
             const start = (pageNumber - 1) * 10;
             console.log(countPerPage, start);
 
-
-
         }
 
         function addProduct(isWow) {
-            var url = $('#url').val()
+            var prodPage = $('#url').val()
             var minNum = $("select :selected").val();
             $.ajax({
-                type: 'POST',
-                url: 'api/add/product',
-                data: { 'url': url, 'minNum': minNum, 'wow': isWow },
+                type: "POST",
+                url: '/api/add/product',
+                headers: {"Content-Type": "application/json"},
+                data: { 'prodPage': prodPage, 'minNum': minNum, 'wow': isWow },
                 success: function (response) {
                     if (response['result'] == 'success') {
                         alert('등록 완료')
                     } else {
-                        alert('등록 실패 ')
+                        alert('등록 실패')
                     }
+                },
+                error: function(request, status, error){
+                    console.log("code: " + request.status)
+                    console.log("message: " + request.responseText)
+                    console.log("error: " + error);
                 }
-            })
-            console.log(url)
+            });
+            console.log(url2)
             console.log(minNum)
             console.log(isWow)
         }
@@ -131,8 +135,8 @@
         </div>
     </div>
     <footer class="card-footer">
-        <a href="#" class="card-footer-item">취소하기</a>
-        <a href="#" onclick="addProduct(is_checked())" class="card-footer-item">등록하기</a>
+        <button class="card-footer-item">취소하기</button>
+        <button onclick="addProduct(is_checked())" class="card-footer-item">등록하기</button>
     </footer>
     </div>
 
@@ -157,7 +161,7 @@
             </div>
             <div class="media-right">
                 <div class="suggestor">
-                    <div class="wowImage"><img src="/Users/kimhyeokjoon/Jungle/project/_049/static/로켓_icon.png" alt="">
+                    <div class="wowImage"><img src="" alt="">
                     </div>
                     <div class="suggestorName">심우정</div>
                 </div>

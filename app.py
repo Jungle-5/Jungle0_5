@@ -20,6 +20,7 @@ db = client.gonggu
 
 SECRET_KEY = 'SECRETT'
 
+
 @app.route('/api/signup', methods=['POST'])
 def api_register():
     id_receive = request.form['uid']
@@ -53,33 +54,17 @@ def api_login():
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 틀렸습니다'})
 
-
-@app.route('/')
-def home():
-    return render_template('logIn.html')
-
-@app.route('/toMain')
-def toMain():
-    return render_template('main.html')
-
-@app.route('/toLogin')
-def toLogin():
-    return render_template('logIn.html')
-
-@app.route('/toSignUp')
-def toSignUp():
-    return render_template('signUp.html')
-
-if __name__ == '__main__':
-    print(sys.executable)
-    app.run('0.0.0.0', port=5001, debug=True)
-
-@app.route('/prod', methods=['POST'])
+@app.route('/api/add/product', methods=['POST'])
 def insert_prod():
-    url_receive = request.form['url_give']
-    wow = request.form['wow_give']
-    minNum = request.form['minNum_give']
-    sid = request.form['uid_give']
+    print('aa')
+    url_receive = request.form['prodPage']
+    wow = request.form['wow']
+    minNum = request.form['minNum']
+    sid = 'alsksdk'
+    #request.form['uid_give']
+    print(url_receive)
+    print(wow)
+    print(minNum)
 
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36', "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"}
     response = requests.get(url_receive, headers=headers)
@@ -106,6 +91,26 @@ def insert_prod():
     else:
         return jsonify({'result':'failure'})
 
+
+@app.route('/')
+def home():
+    return render_template('logIn.html')
+
+@app.route('/toMain')
+def toMain():
+    return render_template('main.html')
+
+@app.route('/toLogin')
+def toLogin():
+    return render_template('logIn.html')
+
+@app.route('/toSignUp')
+def toSignUp():
+    return render_template('signUp.html')
+
+if __name__ == '__main__':
+    print(sys.executable)
+    app.run('0.0.0.0', port=5001, debug=True)
         
 @app.route('/api/prod/ing/show', methods=['POST'])
 def show():
