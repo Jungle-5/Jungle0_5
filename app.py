@@ -16,7 +16,7 @@ import hashlib, datetime, jwt
 app = Flask(__name__)
 
 client = MongoClient('localhost', 27017)
-db = client.O49
+db = client.gonggu
 
 SECRET_KEY = 'SECRETT'
 
@@ -29,7 +29,7 @@ def api_register():
     print('id: '+id_receive+' pw: '+pw_receive+' name: '+name_receive+' phone: '+phone_receive)
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest() #해시 함수 sha256(단방향) 사용해 암호화
     
-    db.users.insert_one({'uid': id_receive, 'pw': pw_hash, 'uname': name_receive, 'phoneNum': phone_receive})
+    result = db.users.insert_one({'uid': id_receive, 'pw': pw_hash, 'uname': name_receive, 'phoneNum': phone_receive})
 
     return jsonify({'result': 'success'})
 
@@ -56,17 +56,29 @@ def api_login():
 
 @app.route('/')
 def home():
+    return render_template('logIn.html')
+
+@app.route('/toMain')
+def toMain():
+    return render_template('main.html')
+
+@app.route('/toLogin')
+def toLogin():
+    return render_template('logIn.html')
+
+@app.route('/toSignUp')
+def toSignUp():
     return render_template('signUp.html')
 
 if __name__ == '__main__':
     print(sys.executable)
     app.run('0.0.0.0', port=5001, debug=True)
 
-@app.route('/prod', methods=['POST'])
+@app.route('api/add/product', methods=['POST'])
 def insert_prod():
-    url_receive = request.form['url_give']
-    wow = request.form['wow_give']
-    minNum = request.form['minNum_give']
+    url_receive = request.form['url']
+    wow = request.form['wow']
+    minNum = request.form['minNum']
     sid = request.form['uid_give']
 
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36', "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"}
@@ -135,3 +147,57 @@ def check():
         return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})
+
+@app.route('api/complete', methods=['POST'])
+def complete():
+    pid = request.form['pid']
+    product = db.products.find_one({'_id':pid})
+    price = product['price']
+    imgurl = product['img']
+    pname = product['pname']
+    uid = product['sid']
+    date = datetime.datetime.now()
+    phoneNum = db.users.find_one({'uid':uid})['phoneNum']
+    
+    res1 = db.history.insert_one({'pid':pid,'price':price,'imgurl':imgurl, 'pname':pname, 'date':date, 'uid':uid, 'phoneNum':phoneNum})
+    ID = res1.inserted_id
+    res2 = db.products.delete_one({'pid':pid})
+    delCount = res2.deleted_count
+    if db.products.find_one({'_id' : ID}) and delCount :
+        return jsonify({'result':'success'})
+    else:
+        return jsonify({'result':'failure'})
+    
+@app.route('api/party', methods=['POST'])
+def participate():
+    pid = request.form['pid']
+    uid = request.form['uid']
+
+    result = db.party.insert_one({'pid':pid, 'uid':uid})
+    ID = result.inserted_id
+    if db.party.find_one({'_id':ID}):
+        return jsonify({'result':'success'})
+    else:
+        return jsonify({'result':'failure'})
+    
+@app.route('api/party/cancel', methods=['POST'])
+def cancel():
+    pid = request.form['pid']
+    uid = request.form['uid']
+
+    result = db.party.delete_one({'pid':pid, 'uid':uid})
+    if result.deleted_count:
+        return jsonify({'result':'success'})
+    else:
+        return jsonify({'result':'failure'})
+    
+@app.route('api/buy/', methods=['POST'])
+def buy():
+    pid = request.form['pid']
+    result = db.products.update_one({'_id':pid}, {'$set':{'state':'배송중'}})
+
+    if result.acknowledged:
+        return jsonify({'result':'success'})
+    else:
+        return jsonify({'result':'failure'})
+    
