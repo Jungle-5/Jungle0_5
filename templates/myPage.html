@@ -83,7 +83,6 @@
             // usertoken 쿠키가 없으면 빈 문자열 반환
             return "";
         }
-
         // 리스트 버튼을 클릭하면 호출됨
         function changeSelector(newMode) {
             // console.log(newMode)
@@ -126,15 +125,14 @@
                 let list = lists[i]
 
                 let state = list['state']
-                let url = list['url']
                 let thumbnail = list['imgurl']
                 let curNum = list['curNum'].toLocaleString()
                 let minNum = list['minNum'].toLocaleString()
                 let date = list['date']
+                let url = list['url']
                 let wow = list['wow']
                 let pname = list['pname']
                 let sname = list['sname']
-                let joined = list['joined']
                 let price = list['price'].toLocaleString()
                 let pid = list['_id']
                 console.log(joined)

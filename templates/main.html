@@ -79,6 +79,7 @@
     </style>
     <script>
         showList();
+
         function searchPosts(pageNumber) {
             const countPerPage = 10;
             const start = (pageNumber - 1) * 10;
@@ -97,6 +98,7 @@
                     if (response['result'] == 'success') {
                         alert('등록 완료')
                         openclose()
+                        showList()
                     } else {
                         alert('등록 실패')
                     }
@@ -107,9 +109,6 @@
                     console.log("error: " + error);
                 }
             });
-            console.log(url)
-            console.log(minNum)
-            console.log(isWow)
         }
 
         function is_checked() {
@@ -144,7 +143,6 @@
                     );
                     console.log('decode: ', decodedPayload); // uid와 exp 들어있음
                     console.log('uid: ', decodedPayload.uid);
-                    console.log('usertoken', userToken);
                     return decodedPayload.uid;
                 }
             }
@@ -155,6 +153,7 @@
         function changeVisability() {
 
         }
+
         function openclose() {
             let status = $('#card').css('display')
             if (status == 'none') {
@@ -166,17 +165,20 @@
             }
         }
         function showList() {
+            var uid = getCookie();
+            alert('showList시작')
+            $('#list-box').empty()
             $.ajax({
                 type: "GET",
-                url: "/api/list",
+                url: "/api/list?uid=" + uid,
                 data: {},
                 success: function (response) {
                     //console.log('showList success')
                     if (response['result'] != 'success') {
                         alert('받아오기 실패')
                     }
-                    let lists = response['list']
-                    //console.log('lists: ', lists)
+                    // console.log(lists)
+                    lists = response['list']
                     addProductCards(lists)
                 },
             })
@@ -192,12 +194,14 @@
 
                 //  state, url, pname, price, curNum, minNum, date, sname, phoneNum
                 let state = list['state']
-                let thumbnail = list['url']
+                let thumbnail = list['imgurl']
                 let curNum = list['curNum'].toLocaleString()
                 let minNum = list['minNum'].toLocaleString()
                 let date = list['date']
+                let url = list['url']
                 let wow = list['wow']
                 let pname = list['pname']
+                let joined = list['joined']
                 let sname = list['sname']
                 let price = list['price'].toLocaleString()
                 let pid = list['_id']
@@ -269,19 +273,19 @@
                 } else if (joined == 2) {
                     cardHtml = `
                     <div class="column" style="background-color: #E9E9E9;">
-                        <h1>${state}</h1>
+                        <div>${state}</div>
                         <div class="media">
                             <div class="media-left">
                                 <a href="${url}" class="image">
                                     <img src="${thumbnail}" alt="">
-                                </figure>
+                                </a>
                             </div>
                             <div class="media-content">
                                 <div class="nameInfo">
                                     <div class="title">${pname}</div>
 
                                 </div>
-                                <p class="subtitle">${price}원</p>
+                                <p class="subtitle">${price}</p>
                                 <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
@@ -360,9 +364,9 @@
                         `
                 }
 
-                // 4. #movie-box에 생성된 HTML 을 붙입니다.
-                $('#movie-box').append(`
-                        <div class="card">
+                // 4. 생성된 HTML 을 붙입니다.
+                $('#list-box').append(`
+                        <div class="productsList">
                             ${cardHtml}
                         </div>
                     `)
@@ -436,10 +440,9 @@
                 }
             });
         }
-        function cancel() {
-
+        function toMyPage() {
+            window.location.href = '/toMyPage';
         }
-
     </script>
 </head>
 
