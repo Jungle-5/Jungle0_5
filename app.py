@@ -149,7 +149,7 @@ def participate():
         return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})
-    
+
 @app.route('/api/user/info', methods=['GET'])
 def info():
     uid = request.args.get('uid')
@@ -301,7 +301,7 @@ def complete():
     else:
         return jsonify({'result': 'failure'})
 
-
+      
 @app.route('/api/party/cancel', methods=['POST'])
 def cancel():
     pid = request.form['pid']

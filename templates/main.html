@@ -62,6 +62,20 @@
         .card {
             display: none;
         }
+
+        .navbar-brand {
+            width: 800px;
+            justify-content: space-between;
+        }
+
+        .navbar {
+            height: 100px;
+        }
+
+        .fa-solid fa-user {
+            width: 80px;
+            height: 80px;
+        }
     </style>
     <script>
         showList();
@@ -184,6 +198,7 @@
                 console.log(joined)
                 let price = list['price'].toLocaleString()
                 let pid = list['_id']
+                console.log(pid)
 
 
                 let cardHtml = ''
@@ -289,6 +304,8 @@
         }
         function join(pid) {
             var uid = getCookie();
+            console.log(pid)
+            console.log(uid)
             $.ajax({
                 type: 'POST',
                 url: '/api/party',
@@ -342,24 +359,20 @@
 </head>
 
 <body>
-    <nav class="navbar is-transparent">
+    <div class="navbar">
         <div class="navbar-brand">
             <a class="navbar-item" href="https://bulma.io">
-                <img src="static/049.png" width="112" height="28">
+                <img src="static/049.png" width="300" height="300">
             </a>
-            <div onclick="toMyPage()" class="navbar-burger" data-target="navbarExampleTransparentExample">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            <i onclick="toMyPage()" class="fa-solid fa-user"></i>
         </div>
-    </nav>
+    </div>
 
     <div class="title">메인 페이지</div>
 
     <div class="listbox" id="list-box">
-    </div>
 
+    </div>
 
 
     <button class="posting-box-btn" onclick="openclose()">+</button>
