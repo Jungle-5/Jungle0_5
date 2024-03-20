@@ -364,30 +364,30 @@
             }
         }
 
-        function showUserInfo() {
-            var uid = getCookie();
-            console.log('showUserInfo start')
-            console.log('uid: ' + uid)
-            $.ajax({
-                type: "GET",
-                url: "/api/user/info?uid=" + uid,
-                data: {},
-                success: function (response) {
-                    if (response['result'] != 'success') {
-                        alert('받아오기 실패')
-                    }
-                    else {
-                        let info = response['info']
-                        makeUserCards(info)
-                    }
-                },
-            })
-        }
+        // function showUserInfo() {
+        //     var uid = getCookie();
+        //     console.log('showUserInfo start')
+        //     console.log('uid: ' + uid)
+        //     $.ajax({
+        //         type: "GET",
+        //         url: "/api/user/info?uid=" + uid,
+        //         data: {},
+        //         success: function (response) {
+        //             if (response['result'] != 'success') {
+        //                 alert('받아오기 실패')
+        //             }
+        //             else {
+        //                 let info = response['info']
+        //                 makeUserCards(info)
+        //             }
+        //         },
+        //     })
+        // }
         function makeUserCards(info) {
-            console.log(info)
-            let name = info['uname']
-            let id = info['uid']
-            let phoneNum = info['phoneNum']
+            // console.log(info)
+            // let name = info['uname']
+            // let id = info['uid']
+            // let phoneNum = info['phoneNum']
             let cardHtml = ''
             cardHtml = `     
                         <p>이름 : ${name}</p>
@@ -487,7 +487,10 @@
     </div>
     <div class="container">
         <div class="userInfo" id="userInfo-box">
-
+            <p>이름 : {{ name }}</p>
+            <p>ID : {{ id }}</p>
+            <p>전화번호 : {{phoneNum}}</p>
+            <button onclick="logout()" type="button" class="button is-primary">로그아웃</button>
         </div>
         <div class="gap"></div>
         <div class="itemList">

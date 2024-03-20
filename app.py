@@ -155,12 +155,10 @@ def complete():
 
     db.history.insert_one({'pid': pid, 'price': price, 'imgurl': imgurl,
                                  'pname': pname, 'date': date, 'uid': uid, 'phoneNum': phoneNum})
-    print(db.history.find_one({'pid':pid}))
-    res2 = db.products.delete_one({'pid': ObjectId(pid)})
-    
-    # print(res2)
-    delCount = res2.deleted_count
-    return jsonify({'result': 'success' , 'res' : delCount})
+
+    print("프로덕트 findone : ", db.products.find_one({'pid': pid}))
+    db.products.delete_one({'pid': ObjectId(pid)})
+
     if db.history.find_one({'pid':pid}):
         return jsonify({'result': 'success'})
     else:
@@ -300,6 +298,17 @@ def mylist():
         
         return jsonify({'result':'success', 'list':ret})
     
+    elif selectMode == 'completed':
+        joined = list(db.party.find({'uid':uid}))
+        ret = []
+        for data in joined:
+            pid = data['pid']
+            print("pid : ", pid)
+            his = list(db.history.find({'pid':pid}))
+            ret.append(his)
+        
+        return jsonify({'result':'success', 'list':ret})
+
     else:
         return jsonify({'result':'failure'})
 
@@ -363,7 +372,14 @@ def toSignUp():
 
 @app.route('/toMyPage')
 def toMyPage():
-    return render_template('myPage.html')
+    access_token = request.cookies.get('usertoken')
+    print('token : ', access_token)
+    decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
+    print('decoded: ', decoded_token)
+    uid = decoded_token['uid']
+    print('uid', uid)
+    userdata = db.users.find_one({'uid':uid})
+    return render_template('myPage.html', name=userdata['uname'], id = userdata['uid'], phoneNum=userdata['phoneNum'])
 
 @app.route('/getCookie', methods=['GET'])
 def getCookie():
