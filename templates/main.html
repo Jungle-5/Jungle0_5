@@ -72,22 +72,29 @@
         }
 
         function addProduct(isWow) {
-            var url = $('#url').val()
+            var prodPage = $('#url').val()
             var minNum = $("select :selected").val();
+            var uid = getCookie();
             $.ajax({
-                type: 'POST',
+                type: "POST",
                 url: '/api/add/product',
-                data: { 'url': url, 'minNum': minNum, 'wow': isWow },
+                headers: {"Content-Type": "application/json"},
+                data: { 'prodPage': prodPage, 'minNum': minNum, 'wow': isWow, 'uid': uid },//'uid': uid
                 success: function (response) {
                     if (response['result'] == 'success') {
                         alert('등록 완료')
                         openclose()
                     } else {
-                        alert('등록 실패 ')
+                        alert('등록 실패')
                     }
+                },
+                error: function(request, status, error){
+                    console.log("code: " + request.status)
+                    console.log("message: " + request.responseText)
+                    console.log("error: " + error);
                 }
-            })
-            console.log(url)
+            });
+            console.log(prodPage)
             console.log(minNum)
             console.log(isWow)
         }
@@ -97,6 +104,35 @@
             const checkbox = document.getElementById('my_checkbox');
             // 2. checked 속성을 체크합니다.
             return checkbox.checked;
+        }
+
+      
+        function getCookie() {
+            var cookieString = document.cookie; //쿠키 다 가져옴
+            console.log(cookieString)
+            var cookies = cookieString.split(';'); //;를 기준으로 쿠키 나누기
+            for (var i = 0; i < cookies.length; i++) { // 쿠키 배열을 순회하며 usertoken에 해당하는 쿠키를 찾음
+                var cookie = cookies[i].trim();
+                if (cookie.indexOf('usertoken') === 0) { // 현재 쿠키가 원하는 이름을 가지고 있는지 확인
+                    userToken = cookie.substring('usertoken'.length + 1);
+                    var payload = userToken.split('.'); //usertoken에서 .을 기준으로 나눠 payload 뽑아내기
+                    //token이 header.payload.signiture니까 payload[1]
+
+                    const decodedPayload = JSON.parse(
+                        decodeURIComponent(
+                        window.atob(payload[1]).split('').map(function (c) {
+                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                            })
+                            .join('')
+	                    )
+                    );
+                    console.log('decode: ',decodedPayload); // uid와 exp 들어있음
+                    console.log('uid: ', decodedPayload.uid);
+                    return decodedPayload.uid;
+                }
+            }
+            // usertoken 쿠키가 없으면 빈 문자열 반환
+            return "";
         }
 
         function changeVisability() {
@@ -218,6 +254,7 @@
         function cancel() {
 
         }
+      
     </script>
 </head>
 
@@ -352,7 +389,6 @@
         </footer>
     </div>
     </div>
-
 
 
     <nav class="pagination" role="navigation" aria-label="pagination">
