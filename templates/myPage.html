@@ -243,6 +243,8 @@
 
         function showUserInfo() {
             var uid = getCookie();
+            console.log('showUserInfo start')
+            console.log('uid: ' + uid)
             $.ajax({
                 type: "GET",
                 url: "/api/user/info?uid=" + uid,
@@ -251,16 +253,17 @@
                     if (response['result'] != 'success') {
                         alert('받아오기 실패')
                     }
-                    let info = response['info']
-                    makeUserCards(info)
+                    else {
+                        let info = response['info']
+                        makeUserCards(info)
+                    }
                 },
             })
         }
         function makeUserCards(info) {
-            console.log(info)
-            let name = list['uname']
-            let id = list['id']
-            let phoneNum = list['phoneNum']
+            let name = info['uname']
+            let id = info['uid']
+            let phoneNum = info['phoneNum']
             let cardHtml = ''
             cardHtml = `     
                         <p>이름 : ${name}</p>
@@ -269,7 +272,7 @@
                         <button onclick="logout()" type="button" class="button is-primary">로그아웃</button>
                     `
             $('#userInfo-box').append(`
-                <div class="info">
+                <div class="inf o">
                     ${cardHtml}
                 </div>
             `)

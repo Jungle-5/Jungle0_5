@@ -131,6 +131,12 @@ def showlist():
     print(products[0])
     return jsonify({'result': 'success', 'list': products})
 
+@app.route('/api/user/info', methods=['GET'])
+def info():
+    uid = request.args.get('uid')
+    res = list(db.users.find_one({'uid':uid}))
+    return jsonify({'result':'success', 'info':res})
+
 @app.route('/api/party', methods=['POST'])
 def participate():
     print("참여 과정 시작!")
@@ -150,11 +156,6 @@ def participate():
     else:
         return jsonify({'result': 'failure'})
 
-@app.route('/api/user/info', methods=['GET'])
-def info():
-    uid = request.args.get('uid')
-    res = list(db.users.find_one({'uid':uid}))
-    return jsonify({'result':'success', 'info':res})
 
 @app.route('/api/signup', methods=['POST'])
 def api_register():
