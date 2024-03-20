@@ -105,12 +105,14 @@ def showlist():
         now = datetime.datetime.now()
         data['date'] = (data['date'] - now).days
         if data['date'] < 0:
-            db.products.delete_one({'pid':pid})
-            db.party.delete_one({'pid':pid})
+            db.products.delete({'pid':pid})
+            db.party.delete({'pid':pid})
             products.remove(data)
             continue
-        pid = data['_id']
-        print("find의 data type : ", type(db.party.find_one({'pid':pid})))
+        pid = str(data['_id'])
+        print("pid : ", pid)
+        print("find의 data type : ", type(db.party.find({'pid':pid})))
+        print("find의 결과 : ", db.party.find({'pid':pid}))
         curNum = len(list(db.party.find({'pid':pid})))
         data['curNum']=curNum
         if data['sid'] == uid:
@@ -126,8 +128,8 @@ def showlist():
         data['_id'] = str(data['_id'])
         sname = db.users.find_one({'uid':data['sid']})['uname']
         data['sname'] = sname
-    print("find 결과 : ", db.party.find_one({'pid':pid,'uid':uid}))
-    print("위에 거 type : ", type(db.party.find_one({'pid':pid,'uid':uid})))
+    print("find 결과 : ", list(db.party.find({'pid':pid,'uid':uid})))
+    print("위에 거 type : ", type(list(db.party.find({'pid':pid,'uid':uid}))))
     print(products[0])
     return jsonify({'result': 'success', 'list': products})
 
