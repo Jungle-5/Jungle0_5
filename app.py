@@ -52,7 +52,7 @@ now = datetime.datetime.now()
 date = now + datetime.timedelta(days=7)
 
 result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': img,
-                                'pname': pname, 'minNum': minNum, 'state': '모집 중', 'sid': sid, 'date': date, 'wow':1})
+                                'pname': pname, 'minNum': minNum, 'state': '모집중', 'sid': sid, 'date': date, 'wow':1})
 pid = str(result.inserted_id)
 db.party.insert_one({'pid': pid, 'uid': sid})
 db.users.insert_one({'uid':'abcd' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
@@ -101,7 +101,6 @@ def insert_prod():
     else:
         return jsonify({'result': 'failure'})
 
-
 @app.route('/api/list', methods=['GET'])
 def showlist():
     uid = request.args.get('uid')
@@ -139,6 +138,16 @@ def showlist():
         data['sname'] = sname
 
     return jsonify({'result': 'success', 'list': products})
+
+
+@app.route('/api/buy/', methods=['POST'])
+def buy():
+    pid = request.form['pid']
+    result = db.products.update_one({'_id': ObjectId(pid)}, {'$set': {'state': '배송중'}})
+    if result.acknowledged:
+        return jsonify({'result': 'success'})
+    else:
+        return jsonify({'result': 'failure'})
 
 
 @app.route('/api/delete/product', methods=['POST'])
@@ -208,16 +217,6 @@ def mylist():
             list_founded = list(db.party.find({'pid':pid}))
             curNum = len(list_founded)
             data['curNum']=curNum
-            if data['sid'] == uid:
-                joined = 1
-            ### 제안자면 joined == 1
-            elif db.party.find_one({'pid':pid,'uid':uid}) is not None:
-                joined = 2
-            ### 참여한 구매자면 joined == 2
-            else:
-                joined = 3
-            ### 참여 안한 구매자면 joined == 3
-            data['joined'] = joined
             sname = db.users.find_one({'uid':data['sid']})['uname']
             data['sname'] = sname
 
@@ -246,6 +245,7 @@ def mylist():
             ret.append(product)
         
         return jsonify({'result':'success', 'list':ret})
+    
     else:
         return jsonify({'result':'failure'})
 
@@ -359,13 +359,22 @@ def complete():
         return jsonify({'result': 'failure'})
 
 
-
-
-@app.route('/api/buy/', methods=['POST'])
-def buy():
+@app.route('/api/party/data', methods=['POST'])
+def showdata():
     pid = request.form['pid']
-    result = db.products.update_one({'_id': pid}, {'$set': {'state': '배송중'}})
-    if result.acknowledged:
-        return jsonify({'result': 'success'})
-    else:
-        return jsonify({'result': 'failure'})
+    uid = request.form['uid']
+    ret = []
+    
+    data = list(db.party.find({'pid':pid}))
+    for person in data:
+        uidfind = person['uid']
+        if person['uid'] == uidfind:
+            continue
+        else :
+            found = db.users.find_one({'uid':uidfind})
+            found.pop('uid', None)
+            found.pop('pw', None)
+            ret.append(found)
+        
+    return jsonify({'result':'success', 'list':ret})
+
