@@ -354,7 +354,7 @@ def complete():
     res1 = db.history.insert_one({'pid': pid, 'price': price, 'imgurl': imgurl,
                                  'pname': pname, 'date': date, 'uid': uid, 'phoneNum': phoneNum})
     ID = res1.inserted_id
-    res2 = db.products.delete_one({'pid': pid})
+    res2 = db.products.delete_one({'pid': ObjectId(pid)})
     delCount = res2.deleted_count
     if db.products.find_one({'_id': ID}) and delCount:
         return jsonify({'result': 'success'})
@@ -380,3 +380,10 @@ def showdata():
             ret.append(found)
         
     return jsonify({'result':'success', 'list':ret})
+
+@app.route('/api/list/histroy', methods=['POST'])
+def history():
+    uid = request.form['uid']
+    data = list(db.history.find({'uid':uid}))
+    
+    return jsonify({'result':'success', 'list':data})
