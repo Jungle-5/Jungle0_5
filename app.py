@@ -30,7 +30,7 @@ db.party.delete_many({})
 
 url_receive = 'https://www.coupang.com/vp/products/7455919074?itemId=18854921300&vendorItemId=85984112985&sourceType=srp_product_ads&clickEventId=48d7dd70-e651-11ee-b2bf-f0b2f521b948&korePlacement=15&koreSubPlacement=1&isAddedCart='
 wow = True
-minNum = 1
+minNum = 5
 sid = 'abcd'
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
            "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"}
@@ -100,7 +100,6 @@ def insert_prod():
         return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})
-
 
 @app.route('/api/list', methods=['GET'])
 def showlist():
@@ -338,7 +337,7 @@ def check():
 
 if __name__ == '__main__':
     print(sys.executable)
-    app.run('0.0.0.0', port=5001, debug=True)
+    app.run('0.0.0.0', port=5000, debug=True)
 
 @app.route('/api/complete', methods=['POST'])
 def complete():
@@ -361,6 +360,14 @@ def complete():
     else:
         return jsonify({'result': 'failure'})
 
+@app.route('/api/buy/', methods=['POST'])
+def buy():
+    pid = request.form['pid']
+    result = db.products.update_one({'_id': pid}, {'$set': {'state': '배송중'}})
+    if result.acknowledged:
+        return jsonify({'result': 'success'})
+    else:
+        return jsonify({'result': 'failure'})
 
 @app.route('/api/party/data', methods=['POST'])
 def showdata():
