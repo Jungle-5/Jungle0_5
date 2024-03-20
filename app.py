@@ -157,7 +157,10 @@ def complete():
                                  'pname': pname, 'date': date, 'uid': uid, 'phoneNum': phoneNum})
     print(db.history.find_one({'pid':pid}))
     res2 = db.products.delete_one({'pid': ObjectId(pid)})
+    
+    # print(res2)
     delCount = res2.deleted_count
+    return jsonify({'result': 'success' , 'res' : delCount})
     if db.history.find_one({'pid':pid}):
         return jsonify({'result': 'success'})
     else:
