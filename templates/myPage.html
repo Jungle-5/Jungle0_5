@@ -245,7 +245,7 @@
             var uid = getCookie();
             $.ajax({
                 type: "GET",
-                url: "/api/user/info?uid=" + uid,
+                url: "/api/user/info?uid="+uid,
                 data: {},
                 success: function (response) {
                     if (response['result'] != 'success') {
@@ -258,9 +258,9 @@
         }
         function makeUserCards(info) {
             console.log(info)
-            let name = list['uname']
-            let id = list['id']
-            let phoneNum = list['phoneNum']
+            let name = info['uname']
+            let id = info['id']
+            let phoneNum = info['phoneNum']
             let cardHtml = ''
             cardHtml = `     
                         <p>이름 : ${name}</p>
