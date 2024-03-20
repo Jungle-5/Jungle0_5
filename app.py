@@ -30,7 +30,7 @@ db.party.delete_many({})
 
 url_receive = 'https://www.coupang.com/vp/products/7455919074?itemId=18854921300&vendorItemId=85984112985&sourceType=srp_product_ads&clickEventId=48d7dd70-e651-11ee-b2bf-f0b2f521b948&korePlacement=15&koreSubPlacement=1&isAddedCart='
 wow = True
-minNum = 5
+minNum = 1
 sid = 'abcd'
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
            "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"}
@@ -101,6 +101,7 @@ def insert_prod():
     else:
         return jsonify({'result': 'failure'})
 
+
 @app.route('/api/list', methods=['GET'])
 def showlist():
     uid = request.args.get('uid')
@@ -164,8 +165,8 @@ def delete():
 def cancel():
     pid = request.form['pid']
     uid = request.form['uid']
-
-    result = db.party.delete_one({'pid': pid, 'uid': uid})
+    print(db.party.find_one({'pid':str(pid),'uid':uid}))
+    result = db.party.delete_one({'pid': str(pid), 'uid': uid})
     if result.deleted_count:
         return jsonify({'result': 'success'})
     else:
@@ -206,7 +207,7 @@ def mylist():
         product = list(db.products.find({'sid':uid}))
         for data in product:
             pid = str(data['_id'])
-            data.pop('_id', None)
+            data['_id']=pid
             now = datetime.datetime.now()
             data['date'] = (data['date'] - now).days
             if data['date'] < 0:
@@ -239,7 +240,7 @@ def mylist():
             print(type(product))
             now = datetime.datetime.now()
             product['date'] = (product['date'] - now).days
-            product.pop('_id', None)
+            product['_id']=pid
             product['curNum'] = curNum
             sid = product['sid']
             sname = db.users.find_one({'uid':sid})['uname']
@@ -337,7 +338,7 @@ def check():
 
 if __name__ == '__main__':
     print(sys.executable)
-    app.run('0.0.0.0', port=5000, debug=True)
+    app.run('0.0.0.0', port=5001, debug=True)
 
 @app.route('/api/complete', methods=['POST'])
 def complete():
@@ -360,14 +361,6 @@ def complete():
     else:
         return jsonify({'result': 'failure'})
 
-@app.route('/api/buy/', methods=['POST'])
-def buy():
-    pid = request.form['pid']
-    result = db.products.update_one({'_id': pid}, {'$set': {'state': '배송중'}})
-    if result.acknowledged:
-        return jsonify({'result': 'success'})
-    else:
-        return jsonify({'result': 'failure'})
 
 @app.route('/api/party/data', methods=['POST'])
 def showdata():
