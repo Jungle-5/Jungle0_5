@@ -52,7 +52,7 @@ now = datetime.datetime.now()
 date = now + datetime.timedelta(days=7)
 
 result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': img,
-                                'pname': pname, 'minNum': minNum, 'state': '모집 중', 'sid': sid, 'date': date, 'wow':1})
+                                'pname': pname, 'minNum': minNum, 'state': '모집중', 'sid': sid, 'date': date, 'wow':1})
 pid = str(result.inserted_id)
 db.party.insert_one({'pid': pid, 'uid': sid})
 db.users.insert_one({'uid':'abcd' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
@@ -92,7 +92,7 @@ def insert_prod():
     date = now + datetime.timedelta(days=7)
 
     result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': img,
-                                    'pname': pname, 'minNum': minNum, 'state': '모집 중', 'sid': sid, 'date': date, 'wow':wow})
+                                    'pname': pname, 'minNum': minNum, 'state': '모집중', 'sid': sid, 'date': date, 'wow':wow})
 
     pid = str(result.inserted_id)
     db.party.insert_one({'pid': pid, 'uid': sid})
@@ -234,6 +234,8 @@ def mylist():
             curNum = len(list_founded)
             print(curNum)
             product = db.products.find_one({'_id':ObjectId(pid)})
+            if product['sid'] == uid:
+                continue
             print(product)
             print(type(product))
             now = datetime.datetime.now()
@@ -335,7 +337,7 @@ def check():
 
 if __name__ == '__main__':
     print(sys.executable)
-    app.run('0.0.0.0', port=5001, debug=True)
+    app.run('0.0.0.0', port=5000, debug=True)
 
 @app.route('/api/complete', methods=['POST'])
 def complete():
@@ -357,9 +359,6 @@ def complete():
         return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})
-
-
-
 
 @app.route('/api/buy/', methods=['POST'])
 def buy():
