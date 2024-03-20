@@ -67,7 +67,7 @@
             displaySelector(selectMode)
             showList()
         }
-
+        let lists = {}
         function showList() {
             $('#list-box').empty()
             $.ajax({
@@ -88,12 +88,18 @@
             $('#list-box').empty()
             for (let i = 0; i < lists.length; i++) {
                 let list = lists[i]
-
+                console.log(list)
                 //  state, url, pname, price, curNum, minNum, date, sname, phoneNum
                 let state = list['state']
-                let thumbnail = list['url']
+                console.log(state)
+                let thumbnail = list['imgurl']
+                console.log(thumbnail)
+                let url = list['url']
+                console.log(url)
                 let curNum = list['curNum'].toLocaleString()
+                console.log(curNum)
                 let minNum = list['minNum'].toLocaleString()
+                console.log(minNum)
                 let date = list['date']
                 let pname = list['pname']
                 let sname = list['sname']
@@ -108,7 +114,7 @@
                         <div>${state}</div>
                         <div class="media">
                             <div class="media-left">
-                                <figure class="image">
+                                <figure href="${url}" class="image">
                                     <img src="${thumbnail}" alt="">
                                 </figure>
                             </div>
@@ -270,7 +276,6 @@
                 <h1>여기에 리스트</h1>
             </div>
         </div>
-
 
     </div>
 </body>
