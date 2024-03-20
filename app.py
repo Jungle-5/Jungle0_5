@@ -54,7 +54,8 @@ result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': i
                                 'pname': pname, 'minNum': minNum, 'state': '모집 중', 'sid': sid, 'date': date})
 pid = result.inserted_id
 db.party.insert_one({'pid': pid, 'uid': sid})
-
+db.users.insert_one({'uid':'abcd' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
+'uname':'abcd', 'phoneNum': '01099999999'})
 
 @app.route('/api/add/product', methods=['POST'])
 def insert_prod():
@@ -97,6 +98,7 @@ def insert_prod():
 @app.route('/api/list', methods=['GET'])
 def showlist():
     uid = request.args.get('uid')
+    print('get : ' + uid)
     products = list(db.products.find({}).sort("date"))
     for data in products:
         now = datetime.datetime.now()

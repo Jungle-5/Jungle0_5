@@ -147,7 +147,6 @@
                 // $('#posting-box-btn').text('포스팅박스 닫기')
             }
         }
-        let lists = {};
         function showList() {
             var uid = getCookie();
             alert('showList시작')
@@ -163,7 +162,6 @@
                     }
                     // console.log(lists)
                     lists = response['list']
-                    console.log(lists)
                     addProductCards(lists)
                 },
             })
