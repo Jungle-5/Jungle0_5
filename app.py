@@ -129,6 +129,17 @@ def showlist():
     print(products[0])
     return jsonify({'result': 'success', 'list': products})
 
+@app.route('/api/party', methods=['POST'])
+def participate():
+    pid = request.form['pid']
+    uid = request.form['uid']
+
+    result = db.party.insert_one({'pid': pid, 'uid': uid})
+    ID = result.inserted_id
+    if db.party.find_one({'_id': ID}):
+        return jsonify({'result': 'success'})
+    else:
+        return jsonify({'result': 'failure'})
 
 @app.route('/api/signup', methods=['POST'])
 def api_register():
@@ -277,17 +288,7 @@ def complete():
         return jsonify({'result': 'failure'})
 
 
-@app.route('/api/party', methods=['POST'])
-def participate():
-    pid = request.form['pid']
-    uid = request.form['uid']
 
-    result = db.party.insert_one({'pid': pid, 'uid': uid})
-    ID = result.inserted_id
-    if db.party.find_one({'_id': ID}):
-        return jsonify({'result': 'success'})
-    else:
-        return jsonify({'result': 'failure'})
 
 
 @app.route('/api/party/cancel', methods=['POST'])

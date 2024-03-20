@@ -49,6 +49,8 @@
         let selectMode = Selector.MY_SUGGEST
 
         $(document).ready(function () {
+            // 사용자 정보를 출력
+            showUserInfo()
             // 리스트를 보여줍니다.
             showList()
 
@@ -240,9 +242,10 @@
 
 
         function showUserInfo() {
+            var uid = getCookie();
             $.ajax({
                 type: "GET",
-                url: "/api/user/info",
+                url: "/api/user/info?uid=" + uid,
                 data: {},
                 success: function (response) {
                     if (response['result'] != 'success') {
@@ -254,13 +257,22 @@
             })
         }
         function makeUserCards(info) {
+
             let name = list['uname']
             let id = list['id']
             let phoneNum = list['phoneNum']
             let cardHtml = ''
-            cardHtml = `
-                    
+            cardHtml = `     
+                        <p>이름 : ${name}</p>
+                        <p>ID : ${id}</p>
+                        <p>전화번호 : ${phoneNum}</p>
+                        <button onclick="logout()" type="button" class="button is-primary">로그아웃</button>
                     `
+            $('#userInfo-box').append(`
+                <div class="info">
+                    ${cardHtml}
+                </div>
+            `)
         }
 
         function logout() {
@@ -272,11 +284,8 @@
 
 <body>
     <div class="container">
-        <div class="userInfo">
-            <p>이름 : 심우정</p>
-            <p>ID : dnwjd</p>
-            <p>전화번호 : 010-0000-0000</p>
-            <button onclick="logout()" type="button" class="button is-primary">로그아웃</button>
+        <div class="userInfo" id="userInfo-box">
+
         </div>
         <div class="gap"></div>
         <div class="itemList">
