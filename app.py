@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from pymongo import DESCENDING
+from bson.objectid import ObjectId
 
 from flask import Flask, render_template, jsonify, request
 from flask.json.provider import JSONProvider
@@ -52,10 +53,16 @@ date = now + datetime.timedelta(days=7)
 
 result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': img,
                                 'pname': pname, 'minNum': minNum, 'state': '모집 중', 'sid': sid, 'date': date})
-pid = result.inserted_id
+pid = str(result.inserted_id)
 db.party.insert_one({'pid': pid, 'uid': sid})
 db.users.insert_one({'uid':'abcd' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
 'uname':'abcd', 'phoneNum': '01099999999'})
+
+firstfind = db.party.find({'pid':pid})
+print("데이터를 넣자마자 find했을 때의 find 결과값 : ", firstfind)
+listed = list(firstfind)
+print(listed)
+print(len(listed))
 
 @app.route('/api/add/product', methods=['POST'])
 def insert_prod():
@@ -87,7 +94,7 @@ def insert_prod():
     result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': img,
                                     'pname': pname, 'minNum': minNum, 'state': '모집 중', 'sid': sid, 'date': date})
 
-    pid = result.inserted_id
+    pid = str(result.inserted_id)
     db.party.insert_one({'pid': pid, 'uid': sid})
     if db.products.find_one({'_id': pid}):
         return jsonify({'result': 'success'})
@@ -98,8 +105,6 @@ def insert_prod():
 @app.route('/api/list', methods=['GET'])
 def showlist():
     uid = request.args.get('uid')
-    print(uid)
-    print('받은 uid의 타입 : ', type(uid))
     products = list(db.products.find({}).sort("date"))
     for data in products:
         now = datetime.datetime.now()
@@ -110,10 +115,14 @@ def showlist():
             products.remove(data)
             continue
         pid = str(data['_id'])
-        print("pid : ", pid)
-        print("find의 data type : ", type(db.party.find({'pid':pid})))
+        #print("pid : ", pid)
+        #print("find의 data type : ", type(db.party.find({'pid':pid})))
         print("find의 결과 : ", db.party.find({'pid':pid}))
-        curNum = len(list(db.party.find({'pid':pid})))
+        print("pid : ", pid, " uid : ", uid)
+        list_founded = list(db.party.find({'pid':pid}))
+        print(list_founded)
+        curNum = len(list_founded)
+        print("curNum : ", curNum)
         data['curNum']=curNum
         if data['sid'] == uid:
             joined = 1
@@ -128,9 +137,7 @@ def showlist():
         data['_id'] = str(data['_id'])
         sname = db.users.find_one({'uid':data['sid']})['uname']
         data['sname'] = sname
-    print("find 결과 : ", list(db.party.find({'pid':pid,'uid':uid})))
-    print("위에 거 type : ", type(list(db.party.find({'pid':pid,'uid':uid}))))
-    print(products[0])
+
     return jsonify({'result': 'success', 'list': products})
 
 @app.route('/api/party', methods=['POST'])
@@ -138,15 +145,8 @@ def participate():
     print("참여 과정 시작!")
     pid = request.form['pid']
     uid = request.form['uid']
-    print("pid : ", pid)
-    print("uid : ", uid)
-    print("파티에서의 uid 타입 : ", type(uid))
-    print((db.party.find_one({'pid': pid, 'uid': uid})))
     result = db.party.insert_one({'pid': pid, 'uid': uid})
     ID = result.inserted_id
-    print("참여 완료!")
-    print(((db.party.find_one({'pid': pid, 'uid': uid}))))
-    print("find의 data type : ", type(db.party.find_one({'pid': pid, 'uid': uid})))
     if db.party.find_one({'_id': ID}):
         return jsonify({'result': 'success'})
     else:
@@ -163,6 +163,67 @@ def info():
     print((res))
 
     return jsonify({'result':'success', 'info':res})
+
+@app.route('/api/list/my',methods=['GET'])
+def mylist():
+    uid = request.args.get('uid')
+    selectMode = request.args.get('selectMode')
+    
+    if selectMode == "suggestor":
+        product = list(db.products.find({'sid':uid}))
+        for data in product:
+            pid = str(data['_id'])
+            data.pop('_id', None)
+            now = datetime.datetime.now()
+            data['date'] = (data['date'] - now).days
+            if data['date'] < 0:
+                db.products.delete({'pid':pid})
+                db.party.delete({'pid':pid})
+                products.remove(data)
+                continue
+            list_founded = list(db.party.find({'pid':pid}))
+            curNum = len(list_founded)
+            data['curNum']=curNum
+            if data['sid'] == uid:
+                joined = 1
+            ### 제안자면 joined == 1
+            elif db.party.find_one({'pid':pid,'uid':uid}) is not None:
+                joined = 2
+            ### 참여한 구매자면 joined == 2
+            else:
+                joined = 3
+            ### 참여 안한 구매자면 joined == 3
+            data['joined'] = joined
+            sname = db.users.find_one({'uid':data['sid']})['uname']
+            data['sname'] = sname
+
+        return jsonify({'result':'success','list':product})
+    
+    elif selectMode == "joined":
+        print("내가 참여한 공구 목록!")
+        ret = []
+        joinproduct = list(db.party.find({'uid':uid}))
+        for data in joinproduct:
+            print(data)
+            pid = str(data['pid'])
+            list_founded = list(db.party.find({'pid':pid}))
+            curNum = len(list_founded)
+            print(curNum)
+            product = db.products.find_one({'_id':ObjectId(pid)})
+            print(product)
+            print(type(product))
+            now = datetime.datetime.now()
+            product['date'] = (product['date'] - now).days
+            product.pop('_id', None)
+            product['curNum'] = curNum
+            sid = product['sid']
+            sname = db.users.find_one({'uid':sid})['uname']
+            product['sname'] = sname
+            ret.append(product)
+        
+        return jsonify({'result':'success', 'list':ret})
+    else:
+        return jsonify({'result':'failure'})
 
 @app.route('/api/signup', methods=['POST'])
 def api_register():
@@ -250,43 +311,7 @@ def check():
 
 if __name__ == '__main__':
     print(sys.executable)
-    app.run('0.0.0.0', port=5001, debug=True)
-
-
-@app.route('/api/prod/ing/show', methods=['POST'])
-def ingshow():
-    uid = request.form['uid_give']
-    prod_list = list(db.products.find({'sid': 'uid'}))
-    if prod_list:
-        return jsonify({'result': 'success', 'products_list': prod_list})
-    else:
-        return jsonify({'result': 'failure'})
-
-
-@app.route('/api/prod/in/show', methods=['POST'])
-def inshow():
-    uid = request.form['uid_give']
-    pidlist = list(db.party.find({'uid': uid}))
-    prod_list = []
-    for pid in pidlist:
-        prod = db.products.find({'_id': pid})
-        prod_list.append(prod)
-
-    if prod_list:
-        return jsonify({'result': 'success', 'products_list': prod_list})
-    else:
-        return jsonify({'result': 'failure'})
-
-
-@app.route('/api/history/show', methods=['POST'])
-def hisshow():
-    uid = request.form['uid_give']
-    his_list = list(db.history.find({'uid': uid}))
-    if his_list:
-        return jsonify({'result': 'success', 'products_list': his_list})
-    else:
-        return jsonify({'result': 'failure'})
-
+    app.run('0.0.0.0', port=5000, debug=True)
 
 @app.route('/api/complete', methods=['POST'])
 def complete():
