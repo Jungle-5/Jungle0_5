@@ -145,6 +145,7 @@ def showlist():
 def complete():
     pid = request.form['pid']
     product = db.products.find_one({'_id': ObjectId(pid)})
+    print(product)
     price = product['price']
     imgurl = product['imgurl']
     pname = product['pname']
@@ -190,7 +191,9 @@ def showdata():
 @app.route('/api/buy/', methods=['POST'])
 def buy():
     pid = request.form['pid']
+    print("pid : ", pid)
     result = db.products.update_one({'_id': ObjectId(pid)}, {'$set': {'state': '배송중'}})
+    print("구매 버튼을 눌렀습니다")
     if result.acknowledged:
         return jsonify({'result': 'success'})
     else:

@@ -380,6 +380,7 @@
                 url: '/api/complete',
                 data: { 'pid': pid },
                 success: function (response) {
+                    console.log(response['result'])
                     if (response['result'] == 'success') {
                         alert('배송 완료')
                         showList();
@@ -391,12 +392,12 @@
         }
 
         function buyProduct(pid) {
-            var uid = getCookie();
             $.ajax({
                 type: 'POST',
                 url: '/api/buy',
-                data: { 'uid': uid, 'pid': pid },
+                data: { 'pid': pid },
                 success: function (response) {
+                    console.log(response['result'])
                     if (response['result'] == 'success') {
                         alert('구매 성공')
                         showList();
