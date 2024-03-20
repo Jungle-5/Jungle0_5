@@ -65,7 +65,6 @@
     </style>
     <script>
         showList();
-
         function searchPosts(pageNumber) {
             const countPerPage = 10;
             const start = (pageNumber - 1) * 10;
@@ -75,26 +74,20 @@
         function addProduct(isWow) {
             var url = $('#url').val();
             var minNum = $("select :selected").val();
-            //var uid = getCookie('usertoken');
-            var Token = getToken('usertoken')
-
-            
-
+            var uid = getCookie();
             $.ajax({
                 type: "POST",
-                url: '/api/add/product', //,'uid': uid,
-                headers: { 'Authorization': 'Bearer ' + Token },
-                data: { 'url': url, 'minNum': minNum, 'wow': isWow,'uid': 'aaa'},
+                url: '/api/add/product', //,'uid': uid
+                data: { 'url': url, 'minNum': minNum, 'wow': isWow,'uid': uid},
                 success: function (response) {
                     if (response['result'] == 'success') {
                         alert('등록 완료')
                         openclose()
-                        showList()
                     } else {
                         alert('등록 실패')
                     }
                 },
-                error: function (request, status, error) {
+                error: function(request, status, error){
                     console.log("code: " + request.status)
                     console.log("message: " + request.responseText)
                     console.log("error: " + error);
@@ -112,46 +105,39 @@
             return checkbox.checked;
         }
 
+      
+        function getCookie() {
+            var cookieString = document.cookie; //쿠키 다 가져옴
+            console.log(cookieString)
+            var cookies = cookieString.split(';'); //;를 기준으로 쿠키 나누기
+            for (var i = 0; i < cookies.length; i++) { // 쿠키 배열을 순회하며 usertoken에 해당하는 쿠키를 찾음
+                var cookie = cookies[i].trim();
+                if (cookie.indexOf('usertoken') === 0) { // 현재 쿠키가 원하는 이름을 가지고 있는지 확인
+                    userToken = cookie.substring('usertoken'.length + 1);
+                    var payload = userToken.split('.'); //usertoken에서 .을 기준으로 나눠 payload 뽑아내기
+                    //token이 header.payload.signiture니까 payload[1]
 
-        // function getCookie() {
-        //     var cookieString = document.cookie; //쿠키 다 가져옴
-        //     console.log(cookieString)
-        //     var cookies = cookieString.split(';'); //;를 기준으로 쿠키 나누기
-        //     for (var i = 0; i < cookies.length; i++) { // 쿠키 배열을 순회하며 usertoken에 해당하는 쿠키를 찾음
-        //         var cookie = cookies[i].trim();
-        //         if (cookie.indexOf('usertoken') === 0) { // 현재 쿠키가 원하는 이름을 가지고 있는지 확인
-        //             userToken = cookie.substring('usertoken'.length + 1);
-        //             var payload = userToken.split('.'); //usertoken에서 .을 기준으로 나눠 payload 뽑아내기
-        //             //token이 header.payload.signiture니까 payload[1]
-
-        //             const decodedPayload = JSON.parse(
-        //                 decodeURIComponent(
-        //                     window.atob(payload[1]).split('').map(function (c) {
-        //                         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        //                     })
-        //                         .join('')
-        //                 )
-        //             );
-        //             console.log('decode: ', decodedPayload); // uid와 exp 들어있음
-        //             console.log('uid: ', decodedPayload.uid);
-        //             return decodedPayload.uid;
-        //         }
-        //     }
-
-        //     // usertoken 쿠키가 없으면 빈 문자열 반환
-        //     return "";
-        // }
-
-        function getToken(name) {
-            var value = "; " + document.cookie;
-            var parts = value.split("; " + name + "=");
-            if (parts.length == 2) return parts.pop().split(";").shift();
+                    const decodedPayload = JSON.parse(
+                        decodeURIComponent(
+                        window.atob(payload[1]).split('').map(function (c) {
+                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                            })
+                            .join('')
+	                    )
+                    );
+                    console.log('decode: ',decodedPayload); // uid와 exp 들어있음
+                    console.log('uid: ', decodedPayload.uid);
+                    console.log('usertoken', userToken);
+                    return decodedPayload.uid;
+                }
+            }
+            // usertoken 쿠키가 없으면 빈 문자열 반환
+            return "";
         }
 
         function changeVisability() {
 
         }
-
         function openclose() {
             let status = $('#card').css('display')
             if (status == 'none') {
@@ -163,11 +149,9 @@
             }
         }
         function showList() {
-            var uid = getCookie();
-            $('#list-box').empty()
             $.ajax({
                 type: "GET",
-                url: "/api/list?uid=" + uid,
+                url: "/api/list",
                 data: {},
                 success: function (response) {
                     //console.log('showList success')
@@ -193,12 +177,10 @@
                 let date = list['date']
                 let pname = list['pname']
                 let sname = list['sname']
-                let joined = list['joined']
                 let price = list['price'].toLocaleString()
 
-
                 let cardHtml = ''
-                if (joined == false) {
+                if (trashMode == false) {
                     cardHtml = `
                     <div class="column" style="background-color: #E9E9E9;">
                         <div>${state}</div>
@@ -274,7 +256,7 @@
         function cancel() {
 
         }
-
+      
     </script>
 </head>
 
