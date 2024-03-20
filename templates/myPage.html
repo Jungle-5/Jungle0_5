@@ -5,18 +5,88 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+
+
+    <!-- jQuery 를 포함합니다. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- CSS library 인 Bulma 를 포함합니다. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
+
+    <!-- 텍스트형태로 되어있는 icon 을 쓸 수 있도록 Font awesome 을 포함하빈다. -->
+    <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
+
+    <title>마이 페이지</title>
     <style>
+        .container {
+            display: flex;
+        }
+
+        .tabs is-right {
+            padding: 20px;
+        }
+
+        .gap {
+            width: 20px;
+        }
+
         .userInfo {
             background-color: beige;
-            width: 100px;
-            height: 100px;
+            width: 250px;
+            height: 1000px;
         }
     </style>
+    <script>
+        function showUserInfo() {
+            $.ajax({
+                type: "GET",
+                url: "/api/user/info",
+                data: {},
+                success: function (response) {
+                    if (response['result'] != 'success') {
+                        alert('받아오기 실패')
+                    }
+                    let info = response['info']
+                    showUserCards(info)
+                },
+            })
+        }
+        function makeUserCards(info) {
+            let name = list['uname']
+            let id = list['id']
+            let phoneNum = list['phoneNum']
+            let cardHtml = ''
+            cardHtml = `
+                    
+                    `
+        }
+
+        function logout() {
+
+        }
+
+    </script>
 </head>
 
 <body>
-
+    <div class="container">
+        <div class="userInfo">
+            <p>이름 : 심우정</p>
+            <p>ID : dnwjd</p>
+            <p>전화번호 : 010-0000-0000</p>
+            <button onclick="logout()" type="button" class="button is-primary">로그아웃</button>
+        </div>
+        <div class="gap"></div>
+        <div class="itemList">
+            <div class="tabs is-right">
+                <ul>
+                    <li><a>내가 제안한 공구</a></li>
+                    <li><a>내가 참여한 공구</a></li>
+                    <li><a>완료 내역</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
