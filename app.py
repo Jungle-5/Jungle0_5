@@ -208,16 +208,6 @@ def mylist():
             list_founded = list(db.party.find({'pid':pid}))
             curNum = len(list_founded)
             data['curNum']=curNum
-            if data['sid'] == uid:
-                joined = 1
-            ### 제안자면 joined == 1
-            elif db.party.find_one({'pid':pid,'uid':uid}) is not None:
-                joined = 2
-            ### 참여한 구매자면 joined == 2
-            else:
-                joined = 3
-            ### 참여 안한 구매자면 joined == 3
-            data['joined'] = joined
             sname = db.users.find_one({'uid':data['sid']})['uname']
             data['sname'] = sname
 
@@ -248,6 +238,7 @@ def mylist():
             ret.append(product)
         
         return jsonify({'result':'success', 'list':ret})
+    
     else:
         return jsonify({'result':'failure'})
 
@@ -368,3 +359,22 @@ def buy():
         return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})
+
+@app.route('/api/party/data', methods=['POST'])
+def showdata():
+    pid = request.form['pid']
+    uid = request.form['uid']
+    ret = []
+    
+    data = list(db.party.find({'pid':pid}))
+    for person in data:
+        uidfind = person['uid']
+        if person['uid'] == uidfind:
+            continue
+        else :
+            found = db.users.find_one({'uid':uidfind})
+            found.pop('uid', None)
+            found.pop('pw', None)
+            ret.append(found)
+        
+    return jsonify({'result':'success', 'list':ret})
