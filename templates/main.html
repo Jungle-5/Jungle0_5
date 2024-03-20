@@ -72,14 +72,13 @@
         }
 
         function addProduct(isWow) {
-            var prodPage = $('#url').val()
+            var url = $('#url').val()
             var minNum = $("select :selected").val();
             var uid = getCookie();
             $.ajax({
                 type: "POST",
                 url: '/api/add/product',
-                headers: {"Content-Type": "application/json"},
-                data: { 'prodPage': prodPage, 'minNum': minNum, 'wow': isWow, 'uid': uid },//'uid': uid
+                data: { 'url': url, 'minNum': minNum, 'wow': isWow, 'uid': uid },//'uid': uid
                 success: function (response) {
                     if (response['result'] == 'success') {
                         alert('등록 완료')
