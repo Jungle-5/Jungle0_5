@@ -98,6 +98,7 @@ def insert_prod():
 @app.route('/api/list', methods=['GET'])
 def showlist():
     uid = request.args.get('uid')
+    print(uid)
     print('get : ' + uid)
     products = list(db.products.find({}).sort("date"))
     for data in products:
@@ -114,7 +115,7 @@ def showlist():
         if data['sid'] == uid:
             joined = 1
         ### 제안자면 joined == 1
-        elif db.party.find({'pid':pid}, {'uid': uid}):
+        elif db.party.find_one({'pid':pid,'uid': uid}):
             joined = 2
         ### 참여한 구매자면 joined == 2
         else:
