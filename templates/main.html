@@ -79,6 +79,7 @@
     </style>
     <script>
         showList();
+
         function searchPosts(pageNumber) {
             const countPerPage = 10;
             const start = (pageNumber - 1) * 10;
@@ -92,24 +93,22 @@
             $.ajax({
                 type: "POST",
                 url: '/api/add/product', //,'uid': uid
-                data: { 'url': url, 'minNum': minNum, 'wow': isWow,'uid': uid},
+                data: { 'url': url, 'minNum': minNum, 'wow': isWow, 'uid': uid },
                 success: function (response) {
                     if (response['result'] == 'success') {
                         alert('등록 완료')
                         openclose()
+                        showList()
                     } else {
                         alert('등록 실패')
                     }
                 },
-                error: function(request, status, error){
+                error: function (request, status, error) {
                     console.log("code: " + request.status)
                     console.log("message: " + request.responseText)
                     console.log("error: " + error);
                 }
             });
-            console.log(url)
-            console.log(minNum)
-            console.log(isWow)
         }
 
         function is_checked() {
@@ -122,7 +121,7 @@
                 return 0;
         }
 
-      
+
         function getCookie() {
             var cookieString = document.cookie; //쿠키 다 가져옴
             console.log(cookieString)
@@ -136,15 +135,14 @@
 
                     const decodedPayload = JSON.parse(
                         decodeURIComponent(
-                        window.atob(payload[1]).split('').map(function (c) {
-                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                            window.atob(payload[1]).split('').map(function (c) {
+                                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                             })
-                            .join('')
-	                    )
+                                .join('')
+                        )
                     );
-                    console.log('decode: ',decodedPayload); // uid와 exp 들어있음
+                    console.log('decode: ', decodedPayload); // uid와 exp 들어있음
                     console.log('uid: ', decodedPayload.uid);
-                    console.log('usertoken', userToken);
                     return decodedPayload.uid;
                 }
             }
@@ -155,6 +153,7 @@
         function changeVisability() {
 
         }
+
         function openclose() {
             let status = $('#card').css('display')
             if (status == 'none') {
@@ -166,17 +165,20 @@
             }
         }
         function showList() {
+            var uid = getCookie();
+            alert('showList시작')
+            $('#list-box').empty()
             $.ajax({
                 type: "GET",
-                url: "/api/list",
+                url: "/api/list?uid=" + uid,
                 data: {},
                 success: function (response) {
                     //console.log('showList success')
                     if (response['result'] != 'success') {
                         alert('받아오기 실패')
                     }
-                    let lists = response['list']
-                    //console.log('lists: ', lists)
+                    // console.log(lists)
+                    lists = response['list']
                     addProductCards(lists)
                 },
             })
@@ -187,24 +189,28 @@
             console.log("wowhtml : " + wowhtml[0])
             console.log("wowhtml : " + wowhtml[1])
             $('#list-box').empty()
+            console.log(lists)
             for (let i = 0; i < lists.length; i++) {
                 let list = lists[i]
 
-                //  state, url, pname, price, curNum, minNum, date, sname, phoneNum
                 let state = list['state']
-                let thumbnail = list['url']
+                let url = list['url']
+                let thumbnail = list['imgurl']
                 let curNum = list['curNum'].toLocaleString()
                 let minNum = list['minNum'].toLocaleString()
                 let date = list['date']
                 let wow = list['wow']
                 let pname = list['pname']
                 let sname = list['sname']
+                let joined = list['joined']
+                console.log(joined)
                 let price = list['price'].toLocaleString()
                 let pid = list['_id']
                 console.log(pid)
 
+
                 let cardHtml = ''
-                if (trashMode == false) {
+                if (joined == 3) {
                     cardHtml = `
                     <div class="column" style="background-color: #E9E9E9;">
                         <div>${state}</div>
@@ -242,14 +248,14 @@
                             <div class="media-left">
                                 <a href="${url}" class="image">
                                     <img src="${thumbnail}" alt="">
-                                </figure>
+                                </a>
                             </div>
                             <div class="media-content">
                                 <div class="nameInfo">
                                     <div class="title">${pname}</div>
 
                                 </div>
-                                <p class="subtitle">${price}원</p>
+                                <p class="subtitle">${price}</p>
                                 <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
@@ -267,19 +273,19 @@
                 } else {
                     cardHtml = `
                     <div class="column" style="background-color: #E9E9E9;">
-                        <div>${state}</div>
+                        <h1>${state}</h1>
                         <div class="media">
                             <div class="media-left">
-                                <figure class="image">
+                                <a href="${url}" class="image">
                                     <img src="${thumbnail}" alt="">
-                                </figure>
+                                </a>
                             </div>
                             <div class="media-content">
                                 <div class="nameInfo">
                                     <div class="title">${pname}</div>
 
                                 </div>
-                                <p class="subtitle">${price}원</p>
+                                <p class="subtitle">${price}</p>
                                 <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
@@ -296,15 +302,14 @@
                         `
                 }
 
-                // 4. #movie-box에 생성된 HTML 을 붙입니다.
-                $('#movie-box').append(`
-                        <div class="card">
+                // 4. 생성된 HTML 을 붙입니다.
+                $('#list-box').append(`
+                        <div class="productsList">
                             ${cardHtml}
                         </div>
                     `)
             }
         }
-      
         function join(pid) {
             var uid = getCookie();
             console.log(pid)
@@ -355,10 +360,9 @@
                 }
             });
         }
-        function cancel() {
-
+        function toMyPage() {
+            window.location.href = '/toMyPage';
         }
-      
     </script>
 </head>
 
