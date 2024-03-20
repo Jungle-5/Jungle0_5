@@ -25,7 +25,7 @@ def insert_prod():
     url_receive = request.form['url']
     wow = request.form['wow']
     minNum = request.form['minNum']
-    sid = 'abcd'
+    sid = request.form['uid']
 
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36', "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"}
     response = requests.get(url_receive, headers=headers)
@@ -62,7 +62,7 @@ def showlist():
         products[i]['curNum']=curNum
         products[i]['_id'] = str(products[i]['_id'])
     
-    print(products[0])
+    #print(products[0])
     
     return jsonify({'result':'success','list':products})
 
@@ -126,6 +126,17 @@ def getCookie():
         return jsonify({'uid': tokenDecode})
     except:
         print('error')
+
+@app.route('/api/check/Duplicate', methods=['POST'])
+def check():
+    id_give = request.form['inputId']
+    print(id_give)
+
+    if db.users.find_one({'uid':id_give}) is None:
+        return jsonify({'result':'success'})
+    else:
+        return jsonify({'result':'failure'})
+        
 
 if __name__ == '__main__':
     print(sys.executable)
@@ -196,14 +207,7 @@ def hisshow():
     else:
         return jsonify({'result':'failure'})
 
-@app.route('/api/check/Duplicate', methods=['POST'])
-def check():
-    id_give = request.form['inputId']
-    user = db.users.find({'uid':id_give})
-    if user:
-        return jsonify({'result': 'success'})
-    else:
-        return jsonify({'result': 'failure'})
+
 
 @app.route('/api/complete', methods=['POST'])
 def complete():
