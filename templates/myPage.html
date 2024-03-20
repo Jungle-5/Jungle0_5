@@ -52,7 +52,7 @@
             // 사용자 정보를 출력
             showUserInfo()
             // 리스트를 보여줍니다.
-            showList()
+            showMyList()
 
         });
 
@@ -93,15 +93,19 @@
 
             selectMode = newMode
             displaySelector(selectMode)
-            showList()
+            showMyList()
         }
         let lists = {}
-        function showList() {
+        function showMyList() {
             var uid = getCookie();
             $('#list-box').empty()
+            // 내가 제안, 내가 참여, 이전 내역
+            // "suggestor",
+            // "joined",
+            // "completed",
             $.ajax({
                 type: "GET",
-                url: "/api/list?uid=" + uid,
+                url: "/api/list/my?uid=" + uid + "&selectMode=" + selectMode,
                 data: {},
                 success: function (response) {
                     if (response['result'] != 'success') {
@@ -287,6 +291,13 @@
 </head>
 
 <body>
+    <div class="navbar">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://bulma.io">
+                <img src="static/049.png" width="300" height="300">
+            </a>
+        </div>
+    </div>
     <div class="container">
         <div class="userInfo" id="userInfo-box">
 
