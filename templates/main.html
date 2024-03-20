@@ -62,6 +62,20 @@
         .card {
             display: none;
         }
+
+        .navbar-brand {
+            width: 800px;
+            justify-content: space-between;
+        }
+
+        .navbar {
+            height: 100px;
+        }
+
+        .fa-solid fa-user {
+            width: 80px;
+            height: 80px;
+        }
     </style>
     <script>
         showList();
@@ -102,7 +116,10 @@
             // 1. checkbox element를 찾습니다.
             const checkbox = document.getElementById('my_checkbox');
             // 2. checked 속성을 체크합니다.
-            return checkbox.checked;
+            if (checkbox.checked)
+                return 1;
+            else
+                return 0;
         }
 
       
@@ -164,7 +181,11 @@
                 },
             })
         }
+
+        const wowhtml = ['', 'static/로켓_icon.png']
         function addProductCards(lists) {
+            console.log("wowhtml : " + wowhtml[0])
+            console.log("wowhtml : " + wowhtml[1])
             $('#list-box').empty()
             for (let i = 0; i < lists.length; i++) {
                 let list = lists[i]
@@ -175,9 +196,12 @@
                 let curNum = list['curNum'].toLocaleString()
                 let minNum = list['minNum'].toLocaleString()
                 let date = list['date']
+                let wow = list['wow']
                 let pname = list['pname']
                 let sname = list['sname']
                 let price = list['price'].toLocaleString()
+                let pid = list['_id']
+                console.log(pid)
 
                 let cardHtml = ''
                 if (trashMode == false) {
@@ -186,7 +210,37 @@
                         <div>${state}</div>
                         <div class="media">
                             <div class="media-left">
-                                <figure class="image">
+                                <a href="${url}" class="image">
+                                    <img src="${thumbnail}" alt="">
+                                </a>
+                            </div>
+                            <div class="media-content">
+                                <div class="nameInfo">
+                                    <div class="title">${pname}</div>
+
+                                </div>
+                                <p class="subtitle">${price}</p>
+                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="date">만료 ${date}일전 </p>
+                            </div>
+                            <div class="media-right">
+                                <div class="suggestor">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
+                                    </div>
+                                    <div class="suggestorName">${sname}</div>
+                                </div>
+                                <button class="button is-primary" onclick="join('${pid}')">참여</button>
+                            </div>
+                        </div>
+                    </div>
+                        `
+                } else if (joined == '2') {
+                    cardHtml = `
+                    <div class="column" style="background-color: #E9E9E9;">
+                        <h1>${state}</h1>
+                        <div class="media">
+                            <div class="media-left">
+                                <a href="${url}" class="image">
                                     <img src="${thumbnail}" alt="">
                                 </figure>
                             </div>
@@ -201,11 +255,11 @@
                             </div>
                             <div class="media-right">
                                 <div class="suggestor">
-                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
-                                <button class="button is-primary" onclick="join()">참여</button>
+                                <button class="button is-danger" onclick="cancel('${pid}')">취소</button>
                             </div>
                         </div>
                     </div>
@@ -231,11 +285,11 @@
                             </div>
                             <div class="media-right">
                                 <div class="suggestor">
-                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
-                                <button class="button is-danger" onclick="cancel()">취소</button>
+                                <button class="button is-danger" onclick="deleteSuggest('${pid}')">삭제</button>
                             </div>
                         </div>
                     </div>
@@ -250,8 +304,56 @@
                     `)
             }
         }
-        function join() {
-
+      
+        function join(pid) {
+            var uid = getCookie();
+            console.log(pid)
+            console.log(uid)
+            $.ajax({
+                type: 'POST',
+                url: '/api/party',
+                data: { 'uid': uid, 'pid': pid },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert('참여 성공')
+                        showList();
+                    } else {
+                        alert('참여 실패')
+                    }
+                }
+            });
+        }
+        function cancel(pid) {
+            var uid = getCookie();
+            $.ajax({
+                type: 'POST',
+                url: '/api/party/cancel',
+                data: { 'uid': uid, 'pid': pid },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert('취소 성공')
+                        showList();
+                    } else {
+                        alert('취소 실패')
+                    }
+                }
+            });
+        }
+        function deleteSuggest(pid) {
+            var uid = getCookie();
+            $.ajax({
+                type: 'POST',
+                url: '/api/delete/product',
+                data: { 'uid': uid, 'pid': pid },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert('삭제 성공')
+                        showList();
+                    } else {
+                        alert('삭제 실패')
+                    }
+                }
+            });
         }
         function cancel() {
 
@@ -261,89 +363,18 @@
 </head>
 
 <body>
-    <nav class="navbar is-transparent">
+    <div class="navbar">
         <div class="navbar-brand">
             <a class="navbar-item" href="https://bulma.io">
-                <img src="static/로켓_icon.png" width="112" height="28">
+                <img src="static/049.png" width="300" height="300">
             </a>
-            <div class="navbar-burger" data-target="navbarExampleTransparentExample">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            <i onclick="toMyPage()" class="fa-solid fa-user"></i>
         </div>
-
-        <div id="navbarExampleTransparentExample" class="navbar-menu">
-            <div class="navbar-start">
-                <a class="navbar-item" href="https://bulma.io/">
-                    Home
-                </a>
-                <div class="navbar-item has-dropdown is-hoverable">
-                    <a class="navbar-link" href="https://bulma.io/documentation/overview/start/">
-                        Docs
-                    </a>
-                    <div class="navbar-dropdown is-boxed">
-                        <a class="navbar-item" href="https://bulma.io/documentation/overview/start/">
-                            Overview
-                        </a>
-                        <a class="navbar-item" href="https://bulma.io/documentation/overview/modifiers/">
-                            Modifiers
-                        </a>
-                        <a class="navbar-item" href="https://bulma.io/documentation/columns/basics/">
-                            Columns
-                        </a>
-                        <a class="navbar-item" href="https://bulma.io/documentation/layout/container/">
-                            Layout
-                        </a>
-                        <a class="navbar-item" href="https://bulma.io/documentation/form/general/">
-                            Form
-                        </a>
-                        <hr class="navbar-divider">
-                        <a class="navbar-item" href="https://bulma.io/documentation/elements/box/">
-                            Elements
-                        </a>
-                        <a class="navbar-item is-active" href="https://bulma.io/documentation/components/breadcrumb/">
-                            Components
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="navbar-end">
-                <div class="navbar-item">
-                    <div class="field is-grouped">
-                        <p class="control">
-                            <a class="bd-tw-button button" data-social-network="Twitter" data-social-action="tweet"
-                                data-social-target="https://bulma.io" target="_blank"
-                                href="https://twitter.com/intent/tweet?text=Bulma: a modern CSS framework based on Flexbox&amp;hashtags=bulmaio&amp;url=https://bulma.io&amp;via=jgthms">
-                                <span class="icon">
-                                    <i class="fab fa-twitter"></i>
-                                </span>
-                                <span>
-                                    Tweet
-                                </span>
-                            </a>
-                        </p>
-                        <p class="control">
-                            <a class="button is-primary"
-                                href="https://github.com/jgthms/bulma/releases/download/0.9.4/bulma-0.9.4.zip">
-                                <span class="icon">
-                                    <i class="fas fa-download"></i>
-                                </span>
-                                <span>Download</span>
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="title">메인 페이지</div>
-
-    <div class="listbox" id="list-box">
     </div>
 
+    <div class="listbox" id="list-box">
+
+    </div>
 
 
     <button class="posting-box-btn" onclick="openclose()">+</button>

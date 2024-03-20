@@ -49,8 +49,10 @@
         let selectMode = Selector.MY_SUGGEST
 
         $(document).ready(function () {
+            // 사용자 정보를 출력
+            showUserInfo()
             // 리스트를 보여줍니다.
-            showList()
+            showMyList()
 
         });
 
@@ -91,15 +93,19 @@
 
             selectMode = newMode
             displaySelector(selectMode)
-            showList()
+            showMyList()
         }
         let lists = {}
-        function showList() {
+        function showMyList() {
             var uid = getCookie();
             $('#list-box').empty()
+            // 내가 제안, 내가 참여, 이전 내역
+            // "suggestor",
+            // "joined",
+            // "completed",
             $.ajax({
                 type: "GET",
-                url: "/api/list?uid=" + uid,
+                url: "/api/list/my?uid=" + uid + "&selectMode=" + selectMode,
                 data: {},
                 success: function (response) {
                     if (response['result'] != 'success') {
@@ -110,8 +116,10 @@
                 },
             })
         }
-
+        const wowhtml = ['', 'static/로켓_icon.png']
         function addProductCards(lists) {
+            console.log("wowhtml : " + wowhtml[0])
+            console.log("wowhtml : " + wowhtml[1])
             $('#list-box').empty()
             for (let i = 0; i < lists.length; i++) {
                 let list = lists[i]
@@ -122,6 +130,7 @@
                 let curNum = list['curNum'].toLocaleString()
                 let minNum = list['minNum'].toLocaleString()
                 let date = list['date']
+                let wow = list['wow']
                 let pname = list['pname']
                 let sname = list['sname']
                 let joined = list['joined']
@@ -150,7 +159,7 @@
                             </div>
                             <div class="media-right">
                                 <div class="suggestor">
-                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
@@ -180,7 +189,7 @@
                             </div>
                             <div class="media-right">
                                 <div class="suggestor">
-                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
@@ -210,7 +219,7 @@
                             </div>
                             <div class="media-right">
                                 <div class="suggestor">
-                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
@@ -240,27 +249,41 @@
 
 
         function showUserInfo() {
+            var uid = getCookie();
+            console.log('showUserInfo start')
+            console.log('uid: ' + uid)
             $.ajax({
                 type: "GET",
-                url: "/api/user/info",
+                url: "/api/user/info?uid=" + uid,
                 data: {},
                 success: function (response) {
                     if (response['result'] != 'success') {
                         alert('받아오기 실패')
                     }
-                    let info = response['info']
-                    showUserCards(info)
+                    else {
+                        let info = response['info']
+                        makeUserCards(info)
+                    }
                 },
             })
         }
         function makeUserCards(info) {
-            let name = list['uname']
-            let id = list['id']
-            let phoneNum = list['phoneNum']
+            console.log(info)
+            let name = info['uname']
+            let id = info['uid']
+            let phoneNum = info['phoneNum']
             let cardHtml = ''
-            cardHtml = `
-                    
+            cardHtml = `     
+                        <p>이름 : ${name}</p>
+                        <p>ID : ${id}</p>
+                        <p>전화번호 : ${phoneNum}</p>
+                        <button onclick="logout()" type="button" class="button is-primary">로그아웃</button>
                     `
+            $('#userInfo-box').append(`
+                <div class="inf o">
+                    ${cardHtml}
+                </div>
+            `)
         }
 
         function logout() {
@@ -271,12 +294,16 @@
 </head>
 
 <body>
+    <div class="navbar">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://bulma.io">
+                <img src="static/049.png" width="300" height="300">
+            </a>
+        </div>
+    </div>
     <div class="container">
-        <div class="userInfo">
-            <p>이름 : 심우정</p>
-            <p>ID : dnwjd</p>
-            <p>전화번호 : 010-0000-0000</p>
-            <button onclick="logout()" type="button" class="button is-primary">로그아웃</button>
+        <div class="userInfo" id="userInfo-box">
+
         </div>
         <div class="gap"></div>
         <div class="itemList">
