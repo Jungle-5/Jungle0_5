@@ -153,7 +153,12 @@ def participate():
 @app.route('/api/user/info', methods=['GET'])
 def info():
     uid = request.args.get('uid')
-    res = list(db.users.find_one({'uid':uid}))
+    print("uid in user info request : ", uid)
+    res = db.users.find_one({'uid':uid})
+    res.pop('_id', None)
+    res.pop('pw', None)
+    print((res))
+
     return jsonify({'result':'success', 'info':res})
 
 @app.route('/api/signup', methods=['POST'])
@@ -242,7 +247,7 @@ def check():
 
 if __name__ == '__main__':
     print(sys.executable)
-    app.run('0.0.0.0', port=5001, debug=True)
+    app.run('0.0.0.0', port=5000, debug=True)
 
 
 @app.route('/api/prod/ing/show', methods=['POST'])
