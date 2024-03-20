@@ -70,6 +70,17 @@ def toLogin():
 def toSignUp():
     return render_template('signUp.html')
 
+@app.route('/getCookie', methods=['GET'])
+def getCookie():
+    try:
+        userToken=request.cookies.get('usertoken')
+        print(userToken)
+        tokenDecode=jwt.decode(userToken, SECRET_KEY, algorithms=['HS256'])
+        print(tokenDecode)
+        return jsonify({'uid': tokenDecode})
+    except:
+        print('error')
+
 if __name__ == '__main__':
     print(sys.executable)
     app.run('0.0.0.0', port=5001, debug=True)
@@ -79,7 +90,7 @@ def insert_prod():
     url_receive = request.form['url']
     wow = request.form['wow']
     minNum = request.form['minNum']
-    sid = request.form['uid_give']
+    sid = request.form['uid']
 
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36', "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"}
     response = requests.get(url_receive, headers=headers)
