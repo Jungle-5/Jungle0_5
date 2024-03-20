@@ -190,6 +190,17 @@ def getCookie():
     except:
         print('error')
 
+        
+@app.route('/api/check/Duplicate', methods=['POST'])
+def check():
+    id_give = request.form['inputId']
+    print(id_give)
+
+    if db.users.find_one({'uid':id_give}) is None:
+        return jsonify({'result':'success'})
+    else:
+        return jsonify({'result':'failure'})
+       
 
 if __name__ == '__main__':
     print(sys.executable)
@@ -265,16 +276,6 @@ def hisshow():
     his_list = list(db.history.find({'uid': uid}))
     if his_list:
         return jsonify({'result': 'success', 'products_list': his_list})
-    else:
-        return jsonify({'result': 'failure'})
-
-
-@app.route('/api/check/Duplicate', methods=['POST'])
-def check():
-    id_give = request.form['inputId']
-    user = db.users.find({'uid': id_give})
-    if user:
-        return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})
 
