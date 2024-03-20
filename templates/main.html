@@ -149,9 +149,10 @@
             }
         }
         function showList() {
+            var uid = getCookie();
             $.ajax({
                 type: "GET",
-                url: "/api/list",
+                url: "/api/list?uid=" + uid,
                 data: {},
                 success: function (response) {
                     if (response['result'] != 'success') {

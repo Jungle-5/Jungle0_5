@@ -86,14 +86,25 @@ def insert_prod():
 
 @app.route('/api/list',methods=['GET'])
 def showlist():
+    uid = request.args.get('uid')
     products = list(db.products.find({}).sort("date"))
     for i in range(len(products)):
         pid = products[i]['_id']
         curNum = len(list(db.party.find({'pid':pid})))
+        if products[i]['sid'] == uid:
+            joined = 1
+        ### 제안자면 joined == 1
+        elif db.party.find({'pid':pid}, {'uid': uid}):
+            joined = 2
+        ### 참여한 구매자면 joined == 2
+        else:
+            joined = 3
+        ### 참여 안한 구매자면 joined == 3
         products[i]['curNum']=curNum
         products[i]['_id'] = str(products[i]['_id'])
         now = datetime.datetime.now()
         products[i]['date'] = (products[i]['date'] - now).days
+        products[i]['joined'] = joined
     
     print(products[0])
     
