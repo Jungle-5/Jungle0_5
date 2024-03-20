@@ -3,7 +3,7 @@ from pymongo import DESCENDING
 
 from flask import Flask, render_template, jsonify, request
 from flask.json.provider import JSONProvider
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 import requests
 import re
@@ -16,11 +16,13 @@ import datetime
 import jwt
 
 app = Flask(__name__)
+app.config["JWT_SECRET_KEY"] = 'SECRETT'
+jwt = JWTManager(app)
 
 client = MongoClient('localhost', 27017)
 db = client.gonggu
 
-SECRET_KEY = 'SECRETT'
+# SECRET_KEY = 'SECRETT'
 
 
 db.users.delete_many({})
@@ -55,9 +57,17 @@ result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': i
 pid = result.inserted_id
 db.party.insert_one({'pid': pid, 'uid': sid})
 
-
 @app.route('/api/add/product', methods=['POST'])
+@jwt_required(optional=True)
 def insert_prod():
+    current_user_id = get_jwt_identity
+    
+    if not current_user_id:
+        return render_template('logIn.html')
+
+    create_access_token = request.cookies.get('usertoken')
+    #jwt.verify(usertoken, SECRET_KEY)
+
     url_receive = request.form['url']
     wow = request.form['wow']
     minNum = request.form['minNum']
@@ -126,6 +136,11 @@ def showlist():
     print(products[0])
     return jsonify({'result': 'success', 'list': products})
 
+@app.route("/users/protected") # uid 추출을 바랄 때 선언하면 댈듯??
+@jwt_required(optional=False)
+def protected():
+    user_id = get_jwt_identity() # 토큰의 식별자 조회, 즉 uid 추출
+    return jsonify(user_id)
 
 @app.route('/api/signup', methods=['POST'])
 def api_register():
@@ -155,12 +170,14 @@ def api_login():
     print(result)
 
     if result is not None:
-        payload = {
-            'uid': id_input,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5)
-        }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        print(token)
+        # payload = {
+        #     'uid': id_input,
+        #     'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5)
+        # }
+        # token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        # print(token)
+        token = create_access_token(identity=id_input) #식별자 id
+
         return jsonify({'result': 'success', 'token': token})
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 틀렸습니다'})
@@ -168,7 +185,7 @@ def api_login():
 
 @app.route('/')
 def home():
-    return render_template('logIn.html')
+        return render_template('logIn.html')
 
 
 @app.route('/toMain')
@@ -211,7 +228,7 @@ def check():
 
 if __name__ == '__main__':
     print(sys.executable)
-    app.run('0.0.0.0', port=5000, debug=True)
+    app.run('0.0.0.0', port=5001, debug=True)
 
 
 @app.route('/api/prod/ing/show', methods=['POST'])
