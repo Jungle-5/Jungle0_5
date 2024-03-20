@@ -141,6 +141,52 @@ def showlist():
     return jsonify({'result': 'success', 'list': products})
 
 
+@app.route('/api/complete', methods=['POST'])
+def complete():
+    pid = request.form['pid']
+    product = db.products.find_one({'_id': ObjectId(pid)})
+    price = product['price']
+    imgurl = product['imgurl']
+    pname = product['pname']
+    uid = product['sid']
+    date = datetime.datetime.now()
+    phoneNum = db.users.find_one({'uid': uid})['phoneNum']
+
+    res1 = db.history.insert_one({'pid': pid, 'price': price, 'imgurl': imgurl,
+                                 'pname': pname, 'date': date, 'uid': uid, 'phoneNum': phoneNum})
+    ID = res1.inserted_id
+    print(db.products.find_one({'_id': ObjectId(ID)}))
+    res2 = db.products.delete_one({'pid': pid})
+    delCount = res2.deleted_count
+    if db.products.find_one({'_id': ObjectId(ID)}):
+        return jsonify({'result': 'success'})
+    else:
+        return jsonify({'result': 'failure'})
+
+
+
+@app.route('/api/party/data', methods=['POST'])
+def showdata():
+    pid = request.form['pid']
+    uid = request.form['uid']
+    ret = []
+    
+    data = list(db.party.find({'pid':str(pid)}))
+    for person in data:
+        print(person)
+        uidfind = person['uid']
+        if uid == uidfind:
+            continue
+        else :
+            found = db.users.find_one({'uid':uidfind})
+            found.pop('uid', None)
+            found.pop('pw', None)
+            found.pop('_id', None)
+            ret.append(found)
+        
+    return jsonify({'result':'success', 'list':ret})
+
+
 @app.route('/api/buy/', methods=['POST'])
 def buy():
     pid = request.form['pid']
@@ -339,44 +385,3 @@ def check():
 if __name__ == '__main__':
     print(sys.executable)
     app.run('0.0.0.0', port=5001, debug=True)
-
-@app.route('/api/complete', methods=['POST'])
-def complete():
-    pid = request.form['pid']
-    product = db.products.find_one({'_id': pid})
-    price = product['price']
-    imgurl = product['img']
-    pname = product['pname']
-    uid = product['sid']
-    date = datetime.datetime.now()
-    phoneNum = db.users.find_one({'uid': uid})['phoneNum']
-
-    res1 = db.history.insert_one({'pid': pid, 'price': price, 'imgurl': imgurl,
-                                 'pname': pname, 'date': date, 'uid': uid, 'phoneNum': phoneNum})
-    ID = res1.inserted_id
-    res2 = db.products.delete_one({'pid': pid})
-    delCount = res2.deleted_count
-    if db.products.find_one({'_id': ID}) and delCount:
-        return jsonify({'result': 'success'})
-    else:
-        return jsonify({'result': 'failure'})
-
-
-@app.route('/api/party/data', methods=['POST'])
-def showdata():
-    pid = request.form['pid']
-    uid = request.form['uid']
-    ret = []
-    
-    data = list(db.party.find({'pid':pid}))
-    for person in data:
-        uidfind = person['uid']
-        if person['uid'] == uidfind:
-            continue
-        else :
-            found = db.users.find_one({'uid':uidfind})
-            found.pop('uid', None)
-            found.pop('pw', None)
-            ret.append(found)
-        
-    return jsonify({'result':'success', 'list':ret})

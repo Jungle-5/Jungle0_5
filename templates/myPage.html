@@ -154,7 +154,7 @@
 
                                 </div>
                                 <p class="subtitle">${price}</p>
-                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <a class="participant" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</a>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
                             <div class="media-right">
@@ -186,7 +186,7 @@
 
                                 </div>
                                 <p class="subtitle">${price}</p>
-                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <a class="participant">${curNum} / ${minNum}명</a>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
                             <div class="media-right">
@@ -215,7 +215,7 @@
 
                                 </div>
                                 <p class="subtitle">${price}</p>
-                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <a class="participant">${curNum} / ${minNum}명</a>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
                             <div class="media-right">
@@ -246,7 +246,7 @@
 
                                 </div>
                                 <p class="subtitle">${price}</p>
-                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <a class="participant" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</a>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
                             <div class="media-right">
@@ -277,7 +277,7 @@
 
                                 </div>
                                 <p class="subtitle">${price}</p>
-                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <a class="participant" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</a>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
                             <div class="media-right">
@@ -310,6 +310,46 @@
             document.getElementById(selectMode).classList.add("is-active")
         }
 
+
+        function showMemberList(pid) {
+            $('#partyList-box').empty()
+            var uid = getCookie();
+            $.ajax({
+                type: 'POST',
+                url: '/api/party/data',
+                data: { 'uid': uid, 'pid': pid },
+                success: function (response) {
+                    if (response['result'] != 'success') {
+                        alert('조회 실패')
+                    }
+                    lists = response['list']
+                    showPartyList(lists)
+                }
+            });
+        }
+        function showPartyList(lists) {
+            console.log('showPartyList start')
+            console.log(lists)
+            for (let i = 0; i < lists.length; i++) {
+                list = lists[i]
+                let name = list['uname']
+                let phoneNum = list['phoneNum']
+                console.log("name : " + name)
+                console.log("phone : " + phoneNum)
+                let cardHtml = ''
+                cardHtml = `     
+                        <tr>
+                            <th>${name}</th>
+                            <th>${phoneNum}</th>
+                        </tr>
+                    `
+                $('#partyList-box').append(`
+                <div class="inf o">
+                    ${cardHtml}
+                </div>
+            `)
+            }
+        }
 
         function showUserInfo() {
             var uid = getCookie();
@@ -450,7 +490,18 @@
                     </li>
                 </ul>
             </div>
-
+            <div class="memberList">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>이름</th>
+                            <th>전화번호</th>
+                        </tr>
+                    </thead>
+                    <tbody id="partyList-box">
+                    </tbody>
+                </table>
+            </div>
             <div class="listbox" id="list-box">
                 <h1>여기에 리스트</h1>
             </div>

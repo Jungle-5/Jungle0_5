@@ -224,7 +224,7 @@
 
                                 </div>
                                 <p class="subtitle">${price}</p>
-                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="participant" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</p>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
                             <div class="media-right">
@@ -233,12 +233,13 @@
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
+                                <button class="button is-dark" onclick="complete('${pid}')">완료</button>
                             </div>
                         </div>
                     </div>
                         `
                 } else if (state == '완료') {
-                    
+
                 }
                 else if (joined == 3) {
                     cardHtml = `
@@ -256,7 +257,7 @@
 
                                 </div>
                                 <p class="subtitle">${price}</p>
-                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="participant" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</p>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
                             <div class="media-right">
@@ -286,7 +287,7 @@
 
                                 </div>
                                 <p class="subtitle">${price}</p>
-                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="participant" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</p>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
                             <div class="media-right">
@@ -317,7 +318,7 @@
 
                                 </div>
                                 <p class="subtitle">${price}원</p>
-                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="participant" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</p>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
                             <div class="media-right">
@@ -348,7 +349,7 @@
 
                                 </div>
                                 <p class="subtitle">${price}</p>
-                                <p class="participant" onclick="showMemberList()">${curNum} / ${minNum}명</p>
+                                <p class="participant" type="button" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</p>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
                             <div class="media-right">
@@ -371,6 +372,22 @@
                         </div>
                     `)
             }
+        }
+
+        function complete(pid) {
+            $.ajax({
+                type: 'POST',
+                url: '/api/complete',
+                data: { 'pid': pid },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert('배송 완료')
+                        showList();
+                    } else {
+                        alert('완료 실패')
+                    }
+                }
+            });
         }
 
         function buyProduct(pid) {
