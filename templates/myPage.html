@@ -116,8 +116,10 @@
                 },
             })
         }
-
+        const wowhtml = ['', 'static/로켓_icon.png']
         function addProductCards(lists) {
+            console.log("wowhtml : " + wowhtml[0])
+            console.log("wowhtml : " + wowhtml[1])
             $('#list-box').empty()
             for (let i = 0; i < lists.length; i++) {
                 let list = lists[i]
@@ -128,6 +130,7 @@
                 let curNum = list['curNum'].toLocaleString()
                 let minNum = list['minNum'].toLocaleString()
                 let date = list['date']
+                let wow = list['wow']
                 let pname = list['pname']
                 let sname = list['sname']
                 let joined = list['joined']
@@ -156,7 +159,7 @@
                             </div>
                             <div class="media-right">
                                 <div class="suggestor">
-                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
@@ -186,7 +189,7 @@
                             </div>
                             <div class="media-right">
                                 <div class="suggestor">
-                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
@@ -216,7 +219,7 @@
                             </div>
                             <div class="media-right">
                                 <div class="suggestor">
-                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>

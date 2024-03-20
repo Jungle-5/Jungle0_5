@@ -115,7 +115,10 @@
             // 1. checkbox element를 찾습니다.
             const checkbox = document.getElementById('my_checkbox');
             // 2. checked 속성을 체크합니다.
-            return checkbox.checked;
+            if (checkbox.checked)
+                return 1;
+            else
+                return 0;
         }
 
 
@@ -180,7 +183,11 @@
                 },
             })
         }
+
+        const wowhtml = ['', 'static/로켓_icon.png']
         function addProductCards(lists) {
+            console.log("wowhtml : " + wowhtml[0])
+            console.log("wowhtml : " + wowhtml[1])
             $('#list-box').empty()
             console.log(lists)
             for (let i = 0; i < lists.length; i++) {
@@ -192,6 +199,7 @@
                 let curNum = list['curNum'].toLocaleString()
                 let minNum = list['minNum'].toLocaleString()
                 let date = list['date']
+                let wow = list['wow']
                 let pname = list['pname']
                 let sname = list['sname']
                 let joined = list['joined']
@@ -223,7 +231,7 @@
                             </div>
                             <div class="media-right">
                                 <div class="suggestor">
-                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
@@ -253,7 +261,7 @@
                             </div>
                             <div class="media-right">
                                 <div class="suggestor">
-                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
@@ -283,7 +291,7 @@
                             </div>
                             <div class="media-right">
                                 <div class="suggestor">
-                                    <div class="wowImage"><img src="static/로켓_icon.png" alt="">
+                                    <div class="wowImage"><img src="${wowhtml[0]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
@@ -367,8 +375,6 @@
             <i onclick="toMyPage()" class="fa-solid fa-user"></i>
         </div>
     </div>
-
-    <div class="title">메인 페이지</div>
 
     <div class="listbox" id="list-box">
 
