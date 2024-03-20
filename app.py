@@ -99,7 +99,7 @@ def insert_prod():
 def showlist():
     uid = request.args.get('uid')
     print(uid)
-    print('get : ' + uid)
+    print('받은 uid의 타입 : ', type(uid))
     products = list(db.products.find({}).sort("date"))
     for data in products:
         now = datetime.datetime.now()
@@ -110,12 +110,13 @@ def showlist():
             products.remove(data)
             continue
         pid = data['_id']
+        print("find의 data type : ", type(db.party.find_one({'pid':pid})))
         curNum = len(list(db.party.find({'pid':pid})))
         data['curNum']=curNum
         if data['sid'] == uid:
             joined = 1
         ### 제안자면 joined == 1
-        elif db.party.find_one({'pid':pid,'uid': uid}):
+        elif db.party.find_one({'pid':pid,'uid':uid}) is not None:
             joined = 2
         ### 참여한 구매자면 joined == 2
         else:
@@ -125,10 +126,35 @@ def showlist():
         data['_id'] = str(data['_id'])
         sname = db.users.find_one({'uid':data['sid']})['uname']
         data['sname'] = sname
-
+    print("find 결과 : ", db.party.find_one({'pid':pid,'uid':uid}))
+    print("위에 거 type : ", type(db.party.find_one({'pid':pid,'uid':uid})))
     print(products[0])
     return jsonify({'result': 'success', 'list': products})
 
+@app.route('/api/party', methods=['POST'])
+def participate():
+    print("참여 과정 시작!")
+    pid = request.form['pid']
+    uid = request.form['uid']
+    print("pid : ", pid)
+    print("uid : ", uid)
+    print("파티에서의 uid 타입 : ", type(uid))
+    print((db.party.find_one({'pid': pid, 'uid': uid})))
+    result = db.party.insert_one({'pid': pid, 'uid': uid})
+    ID = result.inserted_id
+    print("참여 완료!")
+    print(((db.party.find_one({'pid': pid, 'uid': uid}))))
+    print("find의 data type : ", type(db.party.find_one({'pid': pid, 'uid': uid})))
+    if db.party.find_one({'_id': ID}):
+        return jsonify({'result': 'success'})
+    else:
+        return jsonify({'result': 'failure'})
+    
+@app.route('/api/user/info', methods=['GET'])
+def info():
+    uid = request.args.get('uid')
+    res = list(db.users.find_one({'uid':uid}))
+    return jsonify({'result':'success', 'info':res})
 
 @app.route('/api/signup', methods=['POST'])
 def api_register():
@@ -202,7 +228,6 @@ def getCookie():
         return jsonify({'uid': tokenDecode})
     except:
         print('error')
-
         
 @app.route('/api/check/Duplicate', methods=['POST'])
 def check():
@@ -217,7 +242,7 @@ def check():
 
 if __name__ == '__main__':
     print(sys.executable)
-    app.run('0.0.0.0', port=5001, debug=True)
+    app.run('0.0.0.0', port=5000, debug=True)
 
 
 @app.route('/api/prod/ing/show', methods=['POST'])
@@ -272,19 +297,6 @@ def complete():
     res2 = db.products.delete_one({'pid': pid})
     delCount = res2.deleted_count
     if db.products.find_one({'_id': ID}) and delCount:
-        return jsonify({'result': 'success'})
-    else:
-        return jsonify({'result': 'failure'})
-
-
-@app.route('/api/party', methods=['POST'])
-def participate():
-    pid = request.form['pid']
-    uid = request.form['uid']
-
-    result = db.party.insert_one({'pid': pid, 'uid': uid})
-    ID = result.inserted_id
-    if db.party.find_one({'_id': ID}):
         return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})

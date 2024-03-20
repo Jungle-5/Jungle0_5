@@ -153,7 +153,7 @@
             $('#list-box').empty()
             $.ajax({
                 type: "GET",
-                url: "/api/list?uid=" + uid,
+                url: "/api/list?uid="+uid,
                 data: {},
                 success: function (response) {
                     //console.log('showList success')
@@ -212,7 +212,7 @@
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
-                                <button class="button is-primary" onclick="join(${pid})">참여</button>
+                                <button class="button is-primary" onclick="join('${pid}')">참여</button>
                             </div>
                         </div>
                     </div>
@@ -242,7 +242,7 @@
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
-                                <button class="button is-danger" onclick="cancel(${pid})">취소</button>
+                                <button class="button is-danger" onclick="cancel('${pid}')">취소</button>
                             </div>
                         </div>
                     </div>
@@ -272,7 +272,7 @@
                                     </div>
                                     <div class="suggestorName">${sname}</div>
                                 </div>
-                                <button class="button is-danger" onclick="deleteSuggest(${pid})">삭제</button>
+                                <button class="button is-danger" onclick="deleteSuggest('${pid}')">삭제</button>
                             </div>
                         </div>
                     </div>
