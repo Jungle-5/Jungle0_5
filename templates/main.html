@@ -194,13 +194,14 @@
                 let list = lists[i]
 
                 let state = list['state']
-                let url = list['url']
                 let thumbnail = list['imgurl']
                 let curNum = list['curNum'].toLocaleString()
                 let minNum = list['minNum'].toLocaleString()
                 let date = list['date']
+                let url = list['url']
                 let wow = list['wow']
                 let pname = list['pname']
+                let joined = list['joined']
                 let sname = list['sname']
                 let joined = list['joined']
                 console.log(joined)
@@ -243,7 +244,7 @@
                 } else if (joined == 2) {
                     cardHtml = `
                     <div class="column" style="background-color: #E9E9E9;">
-                        <h1>${state}</h1>
+                        <div>${state}</div>
                         <div class="media">
                             <div class="media-left">
                                 <a href="${url}" class="image">

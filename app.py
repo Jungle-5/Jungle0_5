@@ -101,7 +101,6 @@ def insert_prod():
     else:
         return jsonify({'result': 'failure'})
 
-
 @app.route('/api/list', methods=['GET'])
 def showlist():
     uid = request.args.get('uid')
@@ -139,6 +138,16 @@ def showlist():
         data['sname'] = sname
 
     return jsonify({'result': 'success', 'list': products})
+
+
+@app.route('/api/buy/', methods=['POST'])
+def buy():
+    pid = request.form['pid']
+    result = db.products.update_one({'_id': ObjectId(pid)}, {'$set': {'state': '배송중'}})
+    if result.acknowledged:
+        return jsonify({'result': 'success'})
+    else:
+        return jsonify({'result': 'failure'})
 
 
 @app.route('/api/delete/product', methods=['POST'])
