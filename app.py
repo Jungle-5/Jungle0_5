@@ -23,12 +23,45 @@ db = client.gonggu
 SECRET_KEY = 'SECRETT'
 
 
+db.users.delete_many({})
+db.products.delete_many({})
+db.party.delete_many({})
+
+url_receive = 'https://www.coupang.com/vp/products/7455919074?itemId=18854921300&vendorItemId=85984112985&sourceType=srp_product_ads&clickEventId=48d7dd70-e651-11ee-b2bf-f0b2f521b948&korePlacement=15&koreSubPlacement=1&isAddedCart='
+wow = True
+minNum = 5
+sid = 'abcd'
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+           "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"}
+response = requests.get(url_receive, headers=headers)
+soup = BeautifulSoup(response.text, 'html.parser')
+pname = soup.select_one(".prod-buy-header__title").text.strip()
+img = soup.select_one(".prod-image__detail").get('src')
+sale_price = soup.select_one(".prod-sale-price")
+coupon_price = soup.select_one(".prod-coupon-price")
+if wow and coupon_price:
+    price = coupon_price.select_one(".total-price").text.strip()
+elif wow and sale_price:
+    price = sale_price.select_one(".total-price").text.strip()
+elif not wow and sale_price:
+    price = sale_price.select_one(".total-price").text.strip()
+else:
+    price = coupon_price.select_one(".total-price").text.strip()
+now = datetime.datetime.now()
+date = now + datetime.timedelta(days=7)
+
+result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': img,
+                                'pname': pname, 'minNum': minNum, 'state': '모집 중', 'sid': sid, 'date': date})
+pid = result.inserted_id
+db.party.insert_one({'pid': pid, 'uid': sid})
+
+
 @app.route('/api/add/product', methods=['POST'])
 def insert_prod():
     url_receive = request.form['url']
     wow = request.form['wow']
     minNum = request.form['minNum']
-    sid = 'abcd'
+    sid = request.form['uid']
 
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
                "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"}
@@ -49,8 +82,10 @@ def insert_prod():
 
     now = datetime.datetime.now()
     date = now + datetime.timedelta(days=7)
+
     result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': img,
                                     'pname': pname, 'minNum': minNum, 'state': '모집 중', 'sid': sid, 'date': date})
+
     pid = result.inserted_id
     db.party.insert_one({'pid': pid, 'uid': sid})
     if db.products.find_one({'_id': pid}):
@@ -63,13 +98,14 @@ def insert_prod():
 def showlist():
     products = list(db.products.find({}).sort("date"))
     for i in range(len(products)):
-        pid = str(products[i]['_id'])
+        pid = products[i]['_id']
         curNum = len(list(db.party.find({'pid': pid})))
         products[i]['curNum'] = curNum
         products[i]['_id'] = str(products[i]['_id'])
+        now = datetime.datetime.now()
+        products[i]['date'] = (products[i]['date'] - now).days
 
     print(products[0])
-
     return jsonify({'result': 'success', 'list': products})
 
 
