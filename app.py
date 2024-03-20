@@ -156,7 +156,7 @@ def complete():
     db.history.insert_one({'pid': pid, 'price': price, 'imgurl': imgurl,
                                  'pname': pname, 'date': date, 'uid': uid, 'phoneNum': phoneNum})
     print(db.history.find_one({'pid':pid}))
-    res2 = db.products.delete_one({'pid': pid})
+    res2 = db.products.delete_one({'pid': ObjectId(pid)})
     delCount = res2.deleted_count
     if db.history.find_one({'pid':pid}):
         return jsonify({'result': 'success'})
@@ -386,4 +386,4 @@ def check():
 
 if __name__ == '__main__':
     print(sys.executable)
-    app.run('0.0.0.0', port=5000, debug=True)
+    app.run('0.0.0.0', port=5001, debug=True)

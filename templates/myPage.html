@@ -162,6 +162,7 @@
                                     <div class="wowImage"><img src="${wowhtml[wow]}" alt="">
                                     </div>
                                     <div class="suggestorName">${sname}</div>
+                                    onclick="complete('${pid}')">완료</button>
                                 </div>
                             </div>
                         </div>
@@ -302,6 +303,22 @@
             }
         }
 
+        function complete(pid) {
+            $.ajax({
+                type: 'POST',
+                url: '/api/complete',
+                data: { 'pid': pid },
+                success: function (response) {
+                    console.log(response['result'])
+                    if (response['result'] == 'success') {
+                        alert('배송 완료')
+                        showMyList();
+                    } else {
+                        alert('완료 실패')
+                    }
+                }
+            });
+        }
         // 리스트 기준에 따라 해당 버튼만 활성화 시키고 다른 버튼은 비활성화 시킴
         function displaySelector(selectMode) {
             document.getElementById("suggestor").classList.remove("is-active")
