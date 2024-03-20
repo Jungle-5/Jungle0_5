@@ -310,3 +310,12 @@ def buy():
         return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})
+
+@app.route('/api/delete/product', methods=['POST'])
+def delete():
+    pid = request.form['pid']
+    uid = request.form['uid']
+    res1 = db.products.delete_one({'_id':pid})
+    res2 = db.party.delete_many({'pid':pid})
+
+    return jsonify({'result':'success'})
