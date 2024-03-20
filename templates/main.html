@@ -116,12 +116,9 @@
                 data: {},
                 success: function (response) {
                     if (response['result'] != 'success') {
-                        alert(sortMode + ' 순으로 영화 목록 받아오기 실패!')
-                        return
+                        alert('받아오기 실패')
                     }
-                    // 3. 서버가 돌려준 stars_list를 movies 라는 변수에 저장합니다.
                     let lists = response['list']
-                    // 4. 영화 카드를 추가합니다. 이 때 휴지통 여부에 따라 카드 모양이 달라지므로 휴지통 여부(=false)도 같이 전달합니다.
                     addProductCards(lists)
                 },
             })
@@ -214,11 +211,11 @@
                     `)
             }
         }
-        function join(){
+        function join() {
 
         }
-        function cancel(){
-            
+        function cancel() {
+
         }
     </script>
 </head>
