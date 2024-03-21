@@ -18,6 +18,12 @@
     <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
 
     <style>
+        .content {
+            width: 800px;
+            margin: auto;
+            padding-top: 50px;
+        }
+
         .column {
             width: 800px;
             height: 200px;
@@ -79,6 +85,22 @@
     </style>
     <script>
         showList();
+
+        window.addEventListener("load", (event) => { //load될 때마다 확인
+            console.log('reload')
+            //window.location.href = '/api/isToken'
+            $.ajax({
+                type: "GET",
+                url: '/api/isToken', //,'uid': uid
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'end') {
+                        alert('로그인 만료!')
+                        window.location.href = '/toLogin'
+                    }
+                }
+            });
+        });
 
         function searchPosts(pageNumber) {
             const countPerPage = 10;
@@ -166,7 +188,6 @@
         }
         function showList() {
             var uid = getCookie();
-            alert('showList시작')
             $('#list-box').empty()
             $.ajax({
                 type: "GET",
@@ -194,6 +215,7 @@
 
                 //  state, url, pname, price, curNum, minNum, date, sname, phoneNum
                 let state = list['state']
+                console.log("state : " + state)
                 let thumbnail = list['imgurl']
                 let curNum = list['curNum'].toLocaleString()
                 let minNum = list['minNum'].toLocaleString()
@@ -238,10 +260,7 @@
                         </div>
                     </div>
                         `
-                } else if (state == '완료') {
-
-                }
-                else if (joined == 3) {
+                } else if (joined == 3) {
                     cardHtml = `
                     <div class="column" style="background-color: #E9E9E9;">
                         <div>${state}</div>
@@ -317,7 +336,7 @@
                                     <div class="title">${pname}</div>
 
                                 </div>
-                                <p class="subtitle">${price}원</p>
+                                <p class="subtitle">${price}</p>
                                 <p class="participant" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</p>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
@@ -382,9 +401,10 @@
                 success: function (response) {
                     console.log(response['result'])
                     if (response['result'] == 'success') {
-                        alert('배송 완료')
+                        console.log(response['res'])
                         showList();
                     } else {
+                        console.log(response['res'])
                         alert('완료 실패')
                     }
                 }
@@ -399,7 +419,7 @@
                 success: function (response) {
                     console.log(response['result'])
                     if (response['result'] == 'success') {
-                        alert('구매 성공')
+                        alert('구매가 완료되었습니다.')
                         showList();
                     } else {
                         alert('구매 실패')
@@ -418,10 +438,10 @@
                 data: { 'uid': uid, 'pid': pid },
                 success: function (response) {
                     if (response['result'] == 'success') {
-                        alert('참여 성공')
+                        alert('참가를 신청하였습니다.')
                         showList();
                     } else {
-                        alert('참여 실패')
+                        alert('참가 실패')
                     }
                 }
             });
@@ -434,7 +454,7 @@
                 data: { 'uid': uid, 'pid': pid },
                 success: function (response) {
                     if (response['result'] == 'success') {
-                        alert('취소 성공')
+                        alert('공동구매 참여를 취소하였습니다.')
                         showList();
                     } else {
                         alert('취소 실패')
@@ -450,7 +470,7 @@
                 data: { 'uid': uid, 'pid': pid },
                 success: function (response) {
                     if (response['result'] == 'success') {
-                        alert('삭제 성공')
+                        alert('공동구매 제안을 삭제했습니다.')
                         showList();
                     } else {
                         alert('삭제 실패')
@@ -465,94 +485,71 @@
 </head>
 
 <body>
-    <div class="navbar">
-        <div class="navbar-brand">
-            <a class="navbar-item" href="https://bulma.io">
-                <img src="static/049.png" width="300" height="300">
-            </a>
-            <i onclick="toMyPage()" class="fa-solid fa-user"></i>
+    <div class="content">
+        <div class="navbar">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="https://bulma.io">
+                    <img src="static/049.png" width="300" height="300">
+                </a>
+                <i onclick="toMyPage()" class="fa-solid fa-user fa-3x"></i>
+            </div>
+        </div>
+
+        <div class="listbox" id="list-box">
+
+        </div>
+
+
+        <button class="posting-box-btn" onclick="openclose()">+</button>
+
+        <div id="card" , class="card">
+            <header class="card-header">
+                <p class="card-header-title">
+                    등록하기
+                </p>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <label class="label">쿠팡 URL</label>
+                    <div class="control">
+                        <input class="input" id="url"
+                            placeholder="e.g. https://www.coupang.com/vp/products/7121221655?itemId=">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">최소인원</label>
+                    <div class="select" id="minNumber">
+                        <select>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                        </select>
+                    </div>
+                </div>
+                <label class="checkbox">
+                    <input type="checkbox" id="my_checkbox" onclick="is_checked()">
+                    와우 회원 여부
+                </label>
+            </div>
+
+            <footer class="card-footer">
+                <a href="#" onclick="openclose()" class="card-footer-item">취소하기</a>
+                <a href="#" onclick="addProduct(is_checked())" class="card-footer-item">등록하기</a>
+            </footer>
         </div>
     </div>
 
-    <div class="listbox" id="list-box">
-
     </div>
 
 
-    <button class="posting-box-btn" onclick="openclose()">+</button>
 
-    <div id="card" , class="card">
-        <header class="card-header">
-            <p class="card-header-title">
-                등록하기
-            </p>
-        </header>
-        <div class="card-content">
-            <div class="content">
-                <label class="label">쿠팡 URL</label>
-                <div class="control">
-                    <input class="input" id="url"
-                        placeholder="e.g. https://www.coupang.com/vp/products/7121221655?itemId=">
-                </div>
-            </div>
-
-            <div class="field">
-                <label class="label">최소인원</label>
-                <div class="select" id="minNumber">
-                    <select>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                        <option>6</option>
-                        <option>7</option>
-                        <option>8</option>
-                        <option>9</option>
-                        <option>10</option>
-                    </select>
-                </div>
-            </div>
-            <label class="checkbox">
-                <input type="checkbox" id="my_checkbox" onclick="is_checked()">
-                와우 회원 여부
-            </label>
-        </div>
-
-        <footer class="card-footer">
-            <a href="#" onclick="openclose()" class="card-footer-item">취소하기</a>
-            <a href="#" onclick="addProduct(is_checked())" class="card-footer-item">등록하기</a>
-        </footer>
-    </div>
-    </div>
-
-
-    <nav class="pagination" role="navigation" aria-label="pagination">
-        <!-- <a class="pagination-previous">Previous</a>
-        <a class="pagination-next">Next page</a> -->
-        <ul class="pagination-list">
-            <li>
-                <a class="pagination-link" aria-label="Goto page 1">1</a>
-            </li>
-            <li>
-                <span class="pagination-ellipsis">&hellip;</span>
-            </li>
-            <li>
-                <a class="pagination-link" aria-label="Goto page 45">45</a>
-            </li>
-            <li>
-                <a class="pagination-link is-current" aria-label="Page 46" aria-current="page">46</a>
-            </li>
-            <li>
-                <a class="pagination-link" aria-label="Goto page 47">47</a>
-            </li>
-            <li>
-                <span class="pagination-ellipsis">&hellip;</span>
-            </li>
-            <li>
-                <a class="pagination-link" aria-label="Goto page 86">86</a>
-            </li>
-        </ul>
-    </nav>
 </body>
 
 </html>
