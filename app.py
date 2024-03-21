@@ -149,7 +149,7 @@ def insert_prod():
 @app.route('/api/list', methods=['GET'])
 def showlist():
     uid = request.args.get('uid')
-    products = list(db.products.find({}).sort("date"))
+    products = list(db.products.find({}).sort({"date":-1}))
     for data in products:
         now = datetime.datetime.now()
         data['date'] = (data['date'] - now).days
@@ -444,4 +444,4 @@ def check():
 
 if __name__ == '__main__':
     print(sys.executable)
-    app.run('0.0.0.0', port=5001, debug=True)
+    app.run('0.0.0.0', port=5000, debug=True)
