@@ -25,6 +25,7 @@
         }
 
         .column {
+            display: flex;
             width: 800px;
             height: 200px;
             margin: 15px;
@@ -61,10 +62,6 @@
             display: flex;
         }
 
-        .column {
-            display: flex;
-        }
-
         .card {
             display: none;
         }
@@ -81,6 +78,10 @@
         .fa-solid fa-user {
             width: 80px;
             height: 80px;
+        }
+
+        .title {
+            font-size: large;
         }
     </style>
     <script>
@@ -355,7 +356,7 @@
                 else {
                     cardHtml = `
                     <div class="column" style="background-color: #E9E9E9;">
-                        <h1>${state}</h1>
+                        <div>${state}</div>
                         <div class="media">
                             <div class="media-left">
                                 <a href="${url}" class="image">
