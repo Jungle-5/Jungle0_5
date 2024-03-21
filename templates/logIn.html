@@ -18,8 +18,19 @@
     <title>로그인 페이지</title>
 
     <style>
+        h1 {
+            padding-top: 130px;
+            text-align: center;
+        }
+
+
+        .button.is-primary {
+            margin-top: 20px;
+        }
+
         .content {
-            justify-content: center;
+            width: 800px;
+            margin: auto;
         }
     </style>
     <script>
@@ -27,7 +38,6 @@
         function logIn() {
             var uid = $('#id').val()
             var pw = $('#PW').val()
-            alert('login start')
             $.ajax({
                 type: 'POST',
                 url: '/api/login',
@@ -36,7 +46,7 @@
                     if (response['result'] == 'success') {
                         // '로그인 완료' 얼럿을 띄웁니다.
                         document.cookie = 'usertoken=' + response['token'] + '; path=/';
-                        alert('로그인 완료')
+                        alert('로그인 성공')
                         // 메인 페이지로 이동합니다.
                         window.location.href = '/toMain';
 
@@ -62,10 +72,12 @@
     {% endif %}
     <div class="content">
         <div class="titleContainer">
-            <h1>공구할 사람 구함</h1>
+            <h1><span style="color: orange;">공</span>구할 <span style="color: orange;">사</span>람 <span
+                    style="color: orange;">구</span>함</h1>
+
         </div>
 
-        <form class="box">
+        <form class=" box">
             <div>
                 <div class="field">
                     <label class="label">ID</label>

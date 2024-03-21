@@ -14,7 +14,6 @@ import json
 import sys
 import hashlib
 import datetime
-from datetime import timedelta
 import jwt
 
 app = Flask(__name__)
@@ -26,10 +25,11 @@ SECRET_KEY = 'SECRETT'
 
 db.products.delete_many({})
 db.party.delete_many({})
+db.history.delete_many({})
 
 url_receive = 'https://www.coupang.com/vp/products/7455919074?itemId=18854921300&vendorItemId=85984112985&sourceType=srp_product_ads&clickEventId=48d7dd70-e651-11ee-b2bf-f0b2f521b948&korePlacement=15&koreSubPlacement=1&isAddedCart='
 wow = True
-minNum = 1
+minNum = 3
 sid = 'abcd'
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
            "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"}
@@ -55,8 +55,14 @@ result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': i
 pid = str(result.inserted_id)
 db.party.insert_one({'pid': pid, 'uid': sid})
 db.users.insert_one({'uid':'abcd' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
-'uname':'abcd', 'phoneNum': '01099999999'})
 
+'uname':'홍길동', 'phoneNum': '01083719379'})
+db.users.insert_one({'uid':'xkdl3301' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
+'uname':'이연준', 'phoneNum': '01012345678'})
+db.users.insert_one({'uid':'dnwjd' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
+'uname':'심우정', 'phoneNum': '01009871123'})
+db.users.insert_one({'uid':'fufu98' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
+'uname':'김혁준', 'phoneNum': '01012341234'})
 firstfind = db.party.find({'pid':pid})
 print("데이터를 넣자마자 find했을 때의 find 결과값 : ", firstfind)
 listed = list(firstfind)
@@ -98,10 +104,9 @@ def insert_prod():
         exp_time = decoded_token['exp'] #토큰 유효시간
         exp_datetime = datetime.datetime.utcfromtimestamp(exp_time) #토큰의 유효시간으로 UTC 시간대의 datetime 객체 생성
         current_time = datetime.datetime.utcnow() #현재시간
-
         if current_time > exp_datetime: #현재시간이 만료시간을 초과했는지
             return jsonify({'result': 'failure', 'message': '로그인이 만료되었습니다!'})
-        
+
         # 만료된 토큰을 디코드
         decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
     except jwt.exceptions.ExpiredSignatureError:
@@ -143,7 +148,6 @@ def insert_prod():
         return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})
-
 
 @app.route('/api/list', methods=['GET'])
 def showlist():
@@ -198,6 +202,7 @@ def complete():
 
     db.history.insert_one({'pid': pid, 'price': price, 'imgurl': imgurl,
                                  'pname': pname, 'date': date, 'uid': uid, 'phoneNum': phoneNum})
+
     print("프로덕트 findone : ", db.products.find_one({'pid': pid}))
     db.products.delete_one({'pid': ObjectId(pid)})
     if db.history.find_one({'pid':pid}):
@@ -227,27 +232,6 @@ def showdata():
             ret.append(found)
         
     return jsonify({'result':'success', 'list':ret})
-
-@app.route('/api/login', methods=['POST'])
-def api_login():
-    id_input = request.form['uid']
-    pw_input = request.form['pw']
-    pw_hash = hashlib.sha256(pw_input.encode(
-        'utf-8')).hexdigest()  # 해시 함수 sha256(단방향) 사용해 암호화
-    result = db.users.find_one({'uid': id_input, 'pw': pw_hash})
-
-    print(result)
-
-    if result is not None:
-        payload = {
-            'uid': id_input,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)#days=1
-        }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
-        print(token)
-        return jsonify({'result': 'success', 'token': token})
-    else:
-        return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 틀렸습니다'})
 
 
 @app.route('/api/buy/', methods=['POST'])
@@ -298,7 +282,6 @@ def cancel():
         return jsonify({'result': 'failure', 'message': '로그인 만료!'}) #만료된 토큰
     except jwt.DecodeError:
         return jsonify({'result': 'failure', 'message': '유효하지 않은 토큰!'}) #유효하지 않은 토큰
-    
 
         
 
@@ -399,6 +382,7 @@ def mylist():
     else:
         return jsonify({'result':'failure'})
 
+
 @app.route('/api/signup', methods=['POST'])
 def api_register():
     id_receive = request.form['uid']
@@ -409,11 +393,30 @@ def api_register():
           ' name: '+name_receive+' phone: '+phone_receive)
     pw_hash = hashlib.sha256(pw_receive.encode(
         'utf-8')).hexdigest()  # 해시 함수 sha256(단방향) 사용해 암호화
-
     result = db.users.insert_one(
         {'uid': id_receive, 'pw': pw_hash, 'uname': name_receive, 'phoneNum': phone_receive})
-
     return jsonify({'result': 'success'})
+
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    id_input = request.form['uid']
+    pw_input = request.form['pw']
+    pw_hash = hashlib.sha256(pw_input.encode(
+        'utf-8')).hexdigest()  # 해시 함수 sha256(단방향) 사용해 암호화
+    result = db.users.find_one({'uid': id_input, 'pw': pw_hash})
+
+    print(result)
+
+    if result is not None:
+        payload = {
+            'uid': id_input,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        print(token)
+        return jsonify({'result': 'success', 'token': token})
+    else:
+        return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 틀렸습니다'})
 
 
 @app.route('/')
@@ -430,6 +433,7 @@ def toMain():
 def toLogin():
     message = request.args.get('message')
     return render_template('logIn.html', message=message)
+
 
 
 @app.route('/toSignUp')
@@ -473,5 +477,7 @@ def check():
         return jsonify({'result':'failure'})
        
 
+
 if __name__ == "__main__":
     app.run('0.0.0.0', port=5001, debug=True)
+
