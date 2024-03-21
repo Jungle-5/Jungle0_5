@@ -402,6 +402,7 @@
                     console.log(response['result'])
                     if (response['result'] == 'success') {
                         console.log(response['res'])
+                        alert('완료되었습니다.')
                         showList();
                     } else {
                         console.log(response['res'])
@@ -481,6 +482,10 @@
         function toMyPage() {
             window.location.href = '/toMyPage';
         }
+        function toMainPage() {
+            window.location.href = '/toMain';
+        }
+
     </script>
 </head>
 
@@ -488,7 +493,7 @@
     <div class="content">
         <div class="navbar">
             <div class="navbar-brand">
-                <a class="navbar-item" href="https://bulma.io">
+                <a class="navbar-item" onclick="toMainPage()">
                     <img src="static/049.png" width="300" height="300">
                 </a>
                 <i onclick="toMyPage()" class="fa-solid fa-user fa-3x"></i>

@@ -201,7 +201,7 @@ def complete():
                                  'pname': pname, 'date': date, 'uid': uid, 'phoneNum': phoneNum})
 
     print("프로덕트 findone : ", db.products.find_one({'pid': pid}))
-    db.products.delete_one({'pid': ObjectId(pid)})
+    db.products.delete_one({'_id': ObjectId(pid)})
 
     if db.history.find_one({'pid':pid}):
         return jsonify({'result': 'success'})

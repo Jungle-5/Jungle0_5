@@ -22,6 +22,11 @@
             display: flex;
         }
 
+        .navbar {
+            height: 50px;
+            text-align: center;
+        }
+
         .titleContainer {
             width: 500px;
             height: 200px;
@@ -45,11 +50,6 @@
             width: 250px;
             height: 1000px;
 
-        }
-
-        .h1 {
-            padding-top: 130px;
-            text-align: center;
         }
     </style>
     <script>
@@ -460,6 +460,9 @@
             alert('로그아웃 되었습니다.')
             window.location.href = '/';
         }
+        function toMainPage() {
+            window.location.href = '/toMain';
+        }
 
     </script>
 </head>
@@ -467,15 +470,9 @@
 <body>
     <div class="navbar">
         <div class="navbar-brand">
-
-            <div class="titleContainer">
-                <h1><span style="color: orange;">공</span>구할 <span style="color: orange;">사</span>람 <span
-                        style="color: orange;">구</span>함</h1>
-
-            </div>
-            <!-- <a class="navbar-item" href="https://bulma.io">
+            <a class="navbar-item" onclick="toMainPage()">
                 <img src="static/049.png" width="300" height="300">
-            </a> -->
+            </a>
         </div>
     </div>
     <div class="container">
