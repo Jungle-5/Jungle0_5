@@ -2,9 +2,9 @@ from pymongo import MongoClient
 from pymongo import DESCENDING
 from bson.objectid import ObjectId
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, redirect, render_template, jsonify, request, url_for
 from flask.json.provider import JSONProvider
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, jwt_required
 
 import requests
 import re
@@ -23,8 +23,6 @@ db = client.gonggu
 
 SECRET_KEY = 'SECRETT'
 
-
-db.users.delete_many({})
 db.products.delete_many({})
 db.party.delete_many({})
 db.history.delete_many({})
@@ -57,6 +55,7 @@ result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': i
 pid = str(result.inserted_id)
 db.party.insert_one({'pid': pid, 'uid': sid})
 db.users.insert_one({'uid':'abcd' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
+
 'uname':'홍길동', 'phoneNum': '01083719379'})
 db.users.insert_one({'uid':'xkdl3301' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
 'uname':'이연준', 'phoneNum': '01012345678'})
@@ -73,14 +72,16 @@ print(len(listed))
 @app.route('/api/isToken', methods=['GET'])
 def isToken():
     access_token = request.cookies.get('usertoken')
-    try:
+    try: 
         decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
         exp_time = decoded_token['exp'] #토큰 유효시간
         exp_datetime = datetime.datetime.utcfromtimestamp(exp_time) #토큰의 유효시간으로 UTC 시간대의 datetime 객체 생성
         current_time = datetime.datetime.utcnow() #현재시간
+
         if current_time > exp_datetime: #현재시간이 만료시간을 초과했는지
             print('2로그인 이동')
             return jsonify({'result': 'end'})
+        
         # 만료된 토큰을 디코드
         decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
     except jwt.exceptions.ExpiredSignatureError:
@@ -88,28 +89,31 @@ def isToken():
         print('isToken 만료 로그인 이동')
         key = 'fail'
         return jsonify({'result': 'end'})
+    
     return jsonify({'result': 'is'})
 
 @app.route('/api/add/product', methods=['POST'])
 def insert_prod():
     access_token = request.cookies.get('usertoken')
-    print('access_token', access_token)
+    
     if access_token is None:
-        return render_template('logIn.html')
-    try:
+        return jsonify({'result': 'failure', 'message': '로그인이 만료되었습니다!'})
+    
+    try: 
         decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
         exp_time = decoded_token['exp'] #토큰 유효시간
         exp_datetime = datetime.datetime.utcfromtimestamp(exp_time) #토큰의 유효시간으로 UTC 시간대의 datetime 객체 생성
         current_time = datetime.datetime.utcnow() #현재시간
         if current_time > exp_datetime: #현재시간이 만료시간을 초과했는지
-            return render_template('logIn.html')
+            return jsonify({'result': 'failure', 'message': '로그인이 만료되었습니다!'})
+
         # 만료된 토큰을 디코드
         decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
     except jwt.exceptions.ExpiredSignatureError:
         # 만료된 토큰일 경우 로그인 페이지로 이동합니다.
         key = 'fail'
-        return render_template('logIn.html')
-
+        return jsonify({'result': 'failure', 'message': '로그인이 만료되었습니다!'})
+    
     url_receive = request.form['url']
     wow = request.form['wow']
     minNum = request.form['minNum']
@@ -144,7 +148,6 @@ def insert_prod():
         return jsonify({'result': 'success'})
     else:
         return jsonify({'result': 'failure'})
-
 
 @app.route('/api/list', methods=['GET'])
 def showlist():
@@ -201,8 +204,7 @@ def complete():
                                  'pname': pname, 'date': date, 'uid': uid, 'phoneNum': phoneNum})
 
     print("프로덕트 findone : ", db.products.find_one({'pid': pid}))
-    db.products.delete_one({'_id': ObjectId(pid)})
-
+    db.products.delete_one({'pid': ObjectId(pid)})
     if db.history.find_one({'pid':pid}):
         return jsonify({'result': 'success'})
     else:
@@ -248,10 +250,18 @@ def buy():
 def delete():
     pid = request.form['pid']
     uid = request.form['uid']
-    res1 = db.products.delete_one({'_id': ObjectId(pid)})
-    res2 = db.party.delete_many({'pid':pid})
+    access_token = request.cookies.get('usertoken')
 
-    return jsonify({'result':'success'})
+    try:
+        decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
+        res1 = db.products.delete_one({'_id': ObjectId(pid)})
+        res2 = db.party.delete_many({'pid':pid})
+
+        return jsonify({'result':'success'})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'result': 'failure', 'message': '로그인 만료!'}) #만료된 토큰
+    except jwt.DecodeError:
+        return jsonify({'result': 'failure', 'message': '유효하지 않은 토큰!'}) #유효하지 않은 토큰
 
       
 @app.route('/api/party/cancel', methods=['POST'])
@@ -259,11 +269,19 @@ def cancel():
     pid = request.form['pid']
     uid = request.form['uid']
     print(db.party.find_one({'pid':str(pid),'uid':uid}))
-    result = db.party.delete_one({'pid': str(pid), 'uid': uid})
-    if result.deleted_count:
-        return jsonify({'result': 'success'})
-    else:
-        return jsonify({'result': 'failure'})
+    access_token = request.cookies.get('usertoken')
+
+    try:
+        decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
+        result = db.party.delete_one({'pid': str(pid), 'uid': uid})
+        if result.deleted_count:
+            return jsonify({'result': 'success'})
+        else:
+            return jsonify({'result': 'failure'})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'result': 'failure', 'message': '로그인 만료!'}) #만료된 토큰
+    except jwt.DecodeError:
+        return jsonify({'result': 'failure', 'message': '유효하지 않은 토큰!'}) #유효하지 않은 토큰
 
         
 
@@ -272,12 +290,20 @@ def participate():
     print("참여 과정 시작!")
     pid = request.form['pid']
     uid = request.form['uid']
-    result = db.party.insert_one({'pid': pid, 'uid': uid})
-    ID = result.inserted_id
-    if db.party.find_one({'_id': ID}):
-        return jsonify({'result': 'success'})
-    else:
-        return jsonify({'result': 'failure'})
+    access_token=request.cookies.get('usertoken')
+
+    try:
+        decode_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
+        result = db.party.insert_one({'pid': pid, 'uid': uid})
+        ID = result.inserted_id
+        if db.party.find_one({'_id': ID}):
+            return jsonify({'result': 'success'})
+        else:
+            return jsonify({'result': 'failure'})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'result': 'failure', 'message': '로그인 만료!'}) #만료된 토큰
+    except jwt.DecodeError:
+        return jsonify({'result': 'failure', 'message': '유효하지 않은 토큰!'}) #유효하지 않은 토큰
 
 
 @app.route('/api/user/info', methods=['GET'])
@@ -343,10 +369,16 @@ def mylist():
         return jsonify({'result':'success', 'list':ret})
     
     elif selectMode == 'completed':
-        joined = list(db.history.find({'uid':uid}))
+        joined = list(db.party.find({'uid':uid}))
+        ret = []
         for data in joined:
-            data.pop('_id', None)
-        return jsonify({'result':'success', 'list':joined})
+            pid = data['pid']
+            print("pid : ", pid)
+            his = list(db.history.find({'pid':pid}))
+            ret.append(his)
+        
+        return jsonify({'result':'success', 'list':ret})
+
     else:
         return jsonify({'result':'failure'})
 
@@ -361,12 +393,9 @@ def api_register():
           ' name: '+name_receive+' phone: '+phone_receive)
     pw_hash = hashlib.sha256(pw_receive.encode(
         'utf-8')).hexdigest()  # 해시 함수 sha256(단방향) 사용해 암호화
-
     result = db.users.insert_one(
         {'uid': id_receive, 'pw': pw_hash, 'uname': name_receive, 'phoneNum': phone_receive})
-
     return jsonify({'result': 'success'})
-
 
 @app.route('/api/login', methods=['POST'])
 def api_login():
@@ -402,7 +431,9 @@ def toMain():
 
 @app.route('/toLogin')
 def toLogin():
-    return render_template('logIn.html')
+    message = request.args.get('message')
+    return render_template('logIn.html', message=message)
+
 
 
 @app.route('/toSignUp')
@@ -413,13 +444,17 @@ def toSignUp():
 def toMyPage():
     access_token = request.cookies.get('usertoken')
     print('token : ', access_token)
-    decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
-    print('decoded: ', decoded_token)
-    uid = decoded_token['uid']
-    print('uid', uid)
-    userdata = db.users.find_one({'uid':uid})
-    return render_template('myPage.html', name=userdata['uname'], id = userdata['uid'], phoneNum=userdata['phoneNum'])
-
+    try:
+        decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
+        print('decoded: ', decoded_token)
+        uid = decoded_token['uid']
+        print('uid', uid)
+        userdata = db.users.find_one({'uid':uid})
+        return render_template('myPage.html', name=userdata['uname'], id = userdata['uid'], phoneNum=userdata['phoneNum'])
+    except jwt.ExpiredSignatureError:
+        return redirect(url_for('toLogin', message='로그인이 만료되었습니다!'))
+    
+    
 @app.route('/getCookie', methods=['GET'])
 def getCookie():
     try:
@@ -442,6 +477,7 @@ def check():
         return jsonify({'result':'failure'})
        
 
-if __name__ == '__main__':
-    print(sys.executable)
+
+if __name__ == "__main__":
     app.run('0.0.0.0', port=5001, debug=True)
+

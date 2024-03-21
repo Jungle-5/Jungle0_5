@@ -87,7 +87,8 @@
     <script>
         showList();
 
-        window.addEventListener("load", (event) => { //load될 때마다 확인
+
+        window.addEventListener("load", (event) =>{ //load될 때마다 확인
             console.log('reload')
             //window.location.href = '/api/isToken'
             $.ajax({
@@ -124,6 +125,10 @@
                         showList()
                     } else {
                         alert('등록 실패')
+                        if(response['message']){
+                            alert(response['message'])
+                            window.location.href='/toLogin';
+                        }
                     }
                 },
                 error: function (request, status, error) {
@@ -189,6 +194,7 @@
         }
         function showList() {
             var uid = getCookie();
+            alert('showList시작')
             $('#list-box').empty()
             $.ajax({
                 type: "GET",
@@ -216,7 +222,9 @@
 
                 //  state, url, pname, price, curNum, minNum, date, sname, phoneNum
                 let state = list['state']
+
                 console.log("state : " + state)
+
                 let thumbnail = list['imgurl']
                 let curNum = list['curNum'].toLocaleString()
                 let minNum = list['minNum'].toLocaleString()
@@ -262,6 +270,39 @@
                     </div>
                         `
                 } else if (joined == 3) {
+                    cardHtml = `
+                    <div class="column" style="background-color: #E9E9E9;">
+                        <div>${state}</div>
+                        <div class="media">
+                            <div class="media-left">
+                                <a href="${url}" class="image">
+                                    <img src="${thumbnail}" alt="">
+                                </a>
+                            </div>
+                            <div class="media-content">
+                                <div class="nameInfo">
+                                    <div class="title">${pname}</div>
+
+                                </div>
+                                <p class="subtitle">${price}</p>
+                                <p class="participant" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</p>
+                                <p class="date">만료 ${date}일전 </p>
+                            </div>
+                            <div class="media-right">
+                                <div class="suggestor">
+                                    <div class="wowImage"><img src="${wowhtml[wow]}" alt="">
+                                    </div>
+                                    <div class="suggestorName">${sname}</div>
+                                </div>
+                                <button class="button is-dark" onclick="complete('${pid}')">완료</button>
+                            </div>
+                        </div>
+                    </div>
+                        `
+                } else if (state == '완료') {
+
+                }
+                else if (joined == 3) {
                     cardHtml = `
                     <div class="column" style="background-color: #E9E9E9;">
                         <div>${state}</div>
@@ -337,8 +378,39 @@
                                     <div class="title">${pname}</div>
 
                                 </div>
-                                <p class="subtitle">${price}</p>
+                                <p class="subtitle">${price}원</p>
                                 <p class="participant" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</p>
+                                <p class="date">만료 ${date}일전 </p>
+                            </div>
+                            <div class="media-right">
+                                <div class="suggestor">
+                                    <div class="wowImage"><img src="${wowhtml[wow]}" alt="">
+                                    </div>
+                                    <div class="suggestorName">${sname}</div>
+                                </div>
+                                <button class="button is-warning" onclick="buyProduct('${pid}')">구매</button>
+                            </div>
+                        </div>
+                    </div>
+                        `
+                }
+                else {
+                    cardHtml = `
+                    <div class="column" style="background-color: #E9E9E9;">
+                        <h1>${state}</h1>
+                        <div class="media">
+                            <div class="media-left">
+                                <a href="${url}" class="image">
+                                    <img src="${thumbnail}" alt="">
+                                </a>
+                            </div>
+                            <div class="media-content">
+                                <div class="nameInfo">
+                                    <div class="title">${pname}</div>
+
+                                </div>
+                                <p class="subtitle">${price}</p>
+                                <p class="participant" type="button" onclick="showMemberList('${pid}')">${curNum} / ${minNum}명</p>
                                 <p class="date">만료 ${date}일전 </p>
                             </div>
                             <div class="media-right">
@@ -407,6 +479,9 @@
                         showList();
                     } else {
                         console.log(response['res'])
+                        alert('배송 완료')
+                        showList();
+                    } else {
                         alert('완료 실패')
                     }
                 }
@@ -422,6 +497,7 @@
                     console.log(response['result'])
                     if (response['result'] == 'success') {
                         alert('구매가 완료되었습니다.')
+
                         showList();
                     } else {
                         alert('구매 실패')
@@ -443,11 +519,16 @@
                         alert('참가를 신청하였습니다.')
                         showList();
                     } else {
-                        alert('참가 실패')
+                        alert('참여 실패')
+                        if(response['message']){
+                            alert(response['message'])
+                            window.location.href='/toLogin';
+                        }
                     }
                 }
             });
         }
+      
         function cancel(pid) {
             var uid = getCookie();
             $.ajax({
@@ -460,6 +541,10 @@
                         showList();
                     } else {
                         alert('취소 실패')
+                        if(response['message']){
+                            alert(response['message'])
+                            window.location.href='/toLogin';
+                        }
                     }
                 }
             });
@@ -476,6 +561,11 @@
                         showList();
                     } else {
                         alert('삭제 실패')
+                        if(response['message']){
+                            alert(response['message'])
+                            window.location.href='/toLogin';
+                        }
+                        
                     }
                 }
             });
@@ -491,14 +581,17 @@
 </head>
 
 <body>
-    <div class="content">
-        <div class="navbar">
-            <div class="navbar-brand">
-                <a class="navbar-item" onclick="toMainPage()">
-                    <img src="static/049.png" width="300" height="300">
-                </a>
-                <i onclick="toMyPage()" class="fa-solid fa-user fa-3x"></i>
-            </div>
+    {% if message %}
+    <script>
+        alert("{{ message }}")
+    </script>
+    {% endif %}
+    <div class="navbar">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://bulma.io">
+                <img src="static/049.png" width="300" height="300">
+            </a>
+            <i onclick="toMyPage()" class="fa-solid fa-user"></i>
         </div>
 
         <div class="listbox" id="list-box">
