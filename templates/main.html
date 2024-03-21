@@ -124,6 +124,10 @@
                         showList()
                     } else {
                         alert('등록 실패')
+                        if(response['message']){
+                            alert(response['message'])
+                            window.location.href='/toLogin';
+                        }
                     }
                 },
                 error: function (request, status, error) {
@@ -444,6 +448,10 @@
                         showList();
                     } else {
                         alert('참가 실패')
+                        if(response['message']){
+                            alert(response['message'])
+                            window.location.href='/toLogin';
+                        }
                     }
                 }
             });
@@ -460,6 +468,10 @@
                         showList();
                     } else {
                         alert('취소 실패')
+                        if(response['message']){
+                            alert(response['message'])
+                            window.location.href='/toLogin';
+                        }
                     }
                 }
             });
@@ -476,6 +488,10 @@
                         showList();
                     } else {
                         alert('삭제 실패')
+                        if(response['message']){
+                            alert(response['message'])
+                            window.location.href='/toLogin';
+                        }
                     }
                 }
             });
