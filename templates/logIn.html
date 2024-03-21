@@ -55,6 +55,11 @@
 </head>
 
 <body>
+    {% if message %}
+    <script>
+        alert("{{ message }}")
+    </script>
+    {% endif %}
     <div class="content">
         <div class="titleContainer">
             <h1>공구할 사람 구함</h1>
