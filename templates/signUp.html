@@ -17,17 +17,28 @@
 
     <title>회원 가입 페이지</title>
 
+    <style>
+        h1 {
+            padding-top: 130px;
+            text-align: center;
+        }
+
+        .content {
+            width: 800px;
+            margin: auto;
+        }
+    </style>
     <script>
         function signUp() {
             var uid = $('#id').val()
             var pw = $('#pw').val()
             var name = $('#name').val()
             var phoneNum = $('#phoneNumber').val()
-            
-            if(uid == '' || pw == '' || name == '' || phoneNum == ''){
+
+            if (uid == '' || pw == '' || name == '' || phoneNum == '') {
                 alert('빈칸이 존재합니다.')
-            }else{
-                if(duplicateFlag() == true){
+            } else {
+                if (duplicateFlag() == true) {
                     $.ajax({
                         type: "POST",
                         url: "/api/signup",
@@ -41,10 +52,10 @@
                             }
                             else {
                                 alert('회원가입 실패')
-                            }  
+                            }
                         }
                     });
-                }else{
+                } else {
                     alert('중복검사를 진행해주세요.')
                 }
             }
@@ -71,51 +82,54 @@
                     }
                 }
             });
-        }ß
+        }
 
     </script>
 
 </head>
 
 <body>
-    <div class="title">회원가입</div>
-    <form class="box">
-        <div>
-            <div class="field">
-                <label class="label">ID</label>
-                <div class="control">
-                    <input class="input" type="id" id="id" placeholder="ID">
+    <div class="content">
+        <h1 class="title">회원가입</h1>
+        <form class="box">
+            <div>
+                <div class="field">
+                    <label class="label">ID</label>
+                    <div class="control">
+                        <input class="input" type="id" id="id" placeholder="ID">
+                    </div>
+                    <label class="checkbox">
+                        <button onclick="checkDuplicate()" type="button">중복 검사</button>
+                    </label>
                 </div>
-                <label class="checkbox">
-                    <button onclick="checkDuplicate()" type="button">중복 검사</button>
-                </label>
+
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" id="pw" placeholder="********">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">이름</label>
+                    <div class="control">
+                        <input class="input" id="name" placeholder="공사구">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">전화번호</label>
+                    <div class="control">
+                        <input class="input" id="phoneNumber" placeholder="(-)없이 입력">
+                    </div>
+                </div>
+
             </div>
 
-            <div class="field">
-                <label class="label">Password</label>
-                <div class="control">
-                    <input class="input" type="password" id="pw" placeholder="********">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">이름</label>
-                <div class="control">
-                    <input class="input" id="name" placeholder="공사구">
-                </div>
-            </div>
+        </form>
 
-            <div class="field">
-                <label class="label">전화번호</label>
-                <div class="control">
-                    <input class="input" id="phoneNumber" placeholder="(-)없이 입력">
-                </div>
-            </div>
+        <button onclick="signUp()" class="button is-primary">회원 가입</button>
 
-        </div>
-
-    </form>
-
-    <button onclick="signUp()" class="button is-primary">회원 가입</button>
+    </div>
 
 </body>
 

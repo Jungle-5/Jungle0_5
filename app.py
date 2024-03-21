@@ -27,10 +27,11 @@ SECRET_KEY = 'SECRETT'
 db.users.delete_many({})
 db.products.delete_many({})
 db.party.delete_many({})
+db.history.delete_many({})
 
 url_receive = 'https://www.coupang.com/vp/products/7455919074?itemId=18854921300&vendorItemId=85984112985&sourceType=srp_product_ads&clickEventId=48d7dd70-e651-11ee-b2bf-f0b2f521b948&korePlacement=15&koreSubPlacement=1&isAddedCart='
 wow = True
-minNum = 1
+minNum = 3
 sid = 'abcd'
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
            "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"}
@@ -56,16 +57,59 @@ result = db.products.insert_one({'url': url_receive, 'price': price, 'imgurl': i
 pid = str(result.inserted_id)
 db.party.insert_one({'pid': pid, 'uid': sid})
 db.users.insert_one({'uid':'abcd' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
-'uname':'abcd', 'phoneNum': '01099999999'})
-
+'uname':'홍길동', 'phoneNum': '01083719379'})
+db.users.insert_one({'uid':'xkdl3301' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
+'uname':'이연준', 'phoneNum': '01012345678'})
+db.users.insert_one({'uid':'dnwjd' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
+'uname':'심우정', 'phoneNum': '01009871123'})
+db.users.insert_one({'uid':'fufu98' , 'pw':'88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589',
+'uname':'김혁준', 'phoneNum': '01012341234'})
 firstfind = db.party.find({'pid':pid})
 print("데이터를 넣자마자 find했을 때의 find 결과값 : ", firstfind)
 listed = list(firstfind)
 print(listed)
 print(len(listed))
 
+@app.route('/api/isToken', methods=['GET'])
+def isToken():
+    access_token = request.cookies.get('usertoken')
+    try:
+        decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
+        exp_time = decoded_token['exp'] #토큰 유효시간
+        exp_datetime = datetime.datetime.utcfromtimestamp(exp_time) #토큰의 유효시간으로 UTC 시간대의 datetime 객체 생성
+        current_time = datetime.datetime.utcnow() #현재시간
+        if current_time > exp_datetime: #현재시간이 만료시간을 초과했는지
+            print('2로그인 이동')
+            return jsonify({'result': 'end'})
+        # 만료된 토큰을 디코드
+        decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
+    except jwt.exceptions.ExpiredSignatureError:
+        # 만료된 토큰일 경우 로그인 페이지로 이동합니다.
+        print('isToken 만료 로그인 이동')
+        key = 'fail'
+        return jsonify({'result': 'end'})
+    return jsonify({'result': 'is'})
+
 @app.route('/api/add/product', methods=['POST'])
 def insert_prod():
+    access_token = request.cookies.get('usertoken')
+    print('access_token', access_token)
+    if access_token is None:
+        return render_template('logIn.html')
+    try:
+        decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
+        exp_time = decoded_token['exp'] #토큰 유효시간
+        exp_datetime = datetime.datetime.utcfromtimestamp(exp_time) #토큰의 유효시간으로 UTC 시간대의 datetime 객체 생성
+        current_time = datetime.datetime.utcnow() #현재시간
+        if current_time > exp_datetime: #현재시간이 만료시간을 초과했는지
+            return render_template('logIn.html')
+        # 만료된 토큰을 디코드
+        decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
+    except jwt.exceptions.ExpiredSignatureError:
+        # 만료된 토큰일 경우 로그인 페이지로 이동합니다.
+        key = 'fail'
+        return render_template('logIn.html')
+
     url_receive = request.form['url']
     wow = request.form['wow']
     minNum = request.form['minNum']
@@ -299,18 +343,13 @@ def mylist():
         return jsonify({'result':'success', 'list':ret})
     
     elif selectMode == 'completed':
-        joined = list(db.party.find({'uid':uid}))
-        ret = []
+        joined = list(db.history.find({'uid':uid}))
         for data in joined:
-            pid = data['pid']
-            print("pid : ", pid)
-            his = list(db.history.find({'pid':pid}))
-            ret.append(his)
-        
-        return jsonify({'result':'success', 'list':ret})
-
+            data.pop('_id', None)
+        return jsonify({'result':'success', 'list':joined})
     else:
         return jsonify({'result':'failure'})
+
 
 @app.route('/api/signup', methods=['POST'])
 def api_register():
@@ -342,7 +381,7 @@ def api_login():
     if result is not None:
         payload = {
             'uid': id_input,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5)
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         print(token)
